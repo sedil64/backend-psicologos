@@ -22,7 +22,7 @@ import { PlayersModule } from './players/players.module';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         url: configService.get<string>('DATABASE_URL'),
-        synchronize: true, // ⚠️ Solo para desarrollo
+        synchronize: true, 
         ssl: {
           rejectUnauthorized: false,
         },
