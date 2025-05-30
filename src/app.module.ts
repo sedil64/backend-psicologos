@@ -21,14 +21,12 @@ import { PlayersModule } from './players/players.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get<string>('DB_USER', 'postgres'),
-        password: configService.get<string>('DB_PASS', 'admin'),
-        database: configService.get<string>('DB_NAME', 'resultados_db'),
-        synchronize: true, 
-        ssl: { rejectUnauthorized: false },
-        autoLoadEntities: true, 
+        url: configService.get<string>('DATABASE_URL'),
+        synchronize: true, // ⚠️ Solo para desarrollo
+        ssl: {
+          rejectUnauthorized: false,
+        },
+        autoLoadEntities: true,
       }),
     }),
 
