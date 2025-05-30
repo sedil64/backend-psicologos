@@ -12,6 +12,7 @@ import { TeamsModule } from './teams/teams.module';
 import { CategoriesModule } from './categories/categories.module';
 import { PlayersModule } from './players/players.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -35,4 +36,7 @@ import { PlayersModule } from './players/players.module';
     PlayersModule,
   ],
 })
+
 export class AppModule {}
+
+
