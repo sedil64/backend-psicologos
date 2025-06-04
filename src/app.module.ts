@@ -22,15 +22,18 @@ import { PlayersModule } from './players/players.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: parseInt(configService.get<string>('DB_PORT') || '5432', 10),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASS'),
-        database: configService.get<string>('DB_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'], // Corregido
-        synchronize: true,
-        ssl: { rejectUnauthorized: false },
+        console.log('DB_HOST:', configService.get<string>('DB_HOST'));
+        return {
+          type: 'postgres',
+          host: configService.get<string>('DB_HOST'),
+          port: parseInt(configService.get<string>('DB_PORT') || '5432', 10),
+          username: configService.get<string>('DB_USER'),
+          password: configService.get<string>('DB_PASS'),
+          database: configService.get<string>('DB_NAME'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: true,
+          ssl: { rejectUnauthorized: false },
+        };
       }),
       inject: [ConfigService],
     }),
