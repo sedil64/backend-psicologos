@@ -31,8 +31,11 @@ import { PlayersModule } from './players/players.module';
           password: configService.get<string>('DB_PASS'),
           database: configService.get<string>('DB_NAME'),
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: true,
+          synchronize: process.env.NODE_ENV !== 'production',
           ssl: { rejectUnauthorized: false },
+          extra: {
+            ssl: true,
+          },
         };
       },
       inject: [ConfigService],
@@ -46,4 +49,3 @@ import { PlayersModule } from './players/players.module';
   providers: [AppService],
 })
 export class AppModule {}
-
