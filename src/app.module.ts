@@ -21,7 +21,7 @@ import { PlayersModule } from './players/players.module';
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => {
         console.log('DB_HOST:', configService.get<string>('DB_HOST'));
         return {
           type: 'postgres',
@@ -34,7 +34,7 @@ import { PlayersModule } from './players/players.module';
           synchronize: true,
           ssl: { rejectUnauthorized: false },
         };
-      }),
+      },
       inject: [ConfigService],
     }),
 
@@ -46,3 +46,4 @@ import { PlayersModule } from './players/players.module';
   providers: [AppService],
 })
 export class AppModule {}
+
