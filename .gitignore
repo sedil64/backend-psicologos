@@ -4,13 +4,15 @@
 /build
 
 # Logs
-logs
-*.log
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+
+# No ignorar el módulo de logs
+!src/logs/
+!src/logs/logs.module.ts
 
 # OS
 .DS_Store
