@@ -1,49 +1,50 @@
-import * as crypto from 'crypto';
-
-if (!(global as any).crypto) {
-  (global as any).crypto = crypto;
-}
-
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { TeamsModule } from './teams/teams.module';
-import { CategoriesModule } from './categories/categories.module';
-import { PlayersModule } from './players/players.module';
+// Módulos personalizados
+import { UsuariosModule } from './usuarios/usuarios.module';
+import { ServiciosModule } from './servicios/servicios.module';
+import { CitasModule } from './citas/citas.module';
+import { AuthModule } from './auth/auth.module';
+import { LogsModule } from './logs/logs.module';
 
 @Module({
   imports: [
+    // Configuración global de variables de entorno
     ConfigModule.forRoot({ isGlobal: true }),
 
+    // Conexión a MongoDB (Atlas)
+    MongooseModule.forRoot(process.env.MONGO_URI || ''),
+
+    // Conexión a PostgreSQL (Neon)
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        console.log('DB_HOST:', configService.get<string>('DB_HOST'));
-        return {
-          type: 'postgres',
-          host: configService.get<string>('DB_HOST'),
-          port: parseInt(configService.get<string>('DB_PORT') || '5432', 10),
-          username: configService.get<string>('DB_USER'),
-          password: configService.get<string>('DB_PASS'),
-          database: configService.get<string>('DB_NAME'),
-          entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: process.env.NODE_ENV !== 'production',
-          ssl: { rejectUnauthorized: false },
-          extra: {
-            ssl: true,
-          },
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: parseInt(configService.get<string>('DB_PORT') || '5432', 10),
+        username: configService.get<string>('DB_USER'),
+        password: configService.get<string>('DB_PASS'),
+        database: configService.get<string>('DB_NAME'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: process.env.NODE_ENV !== 'production',
+        ssl: { rejectUnauthorized: false },
+        extra: { ssl: true },
+      }),
       inject: [ConfigService],
     }),
 
-    TeamsModule,
-    CategoriesModule,
-    PlayersModule,
+    // Módulos funcionales
+    UsuariosModule,
+    ServiciosModule,
+    CitasModule,
+    AuthModule,
+    LogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

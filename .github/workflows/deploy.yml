@@ -1,4 +1,4 @@
-name: 🚀 Deploy NestJS Blog Backend API to VPS
+name: 🚀 Deploy NestJS Bcd ..log Backend API to VPS
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         script: |
-          cd /root/nestjs-blog-backend
+          cd cd /root/quistial_dilan/resultados-deportivos-backend
           echo "$${{ secrets.ENV_FILE }}" > .env
           npm install
           npm run build
