@@ -1,5 +1,11 @@
 import { IsEmail, IsString, MinLength, IsEnum } from 'class-validator';
 
+export enum Rol {
+  Admin = 'admin',
+  Psychologist = 'psychologist',
+  Patient = 'patient',
+}
+
 export class RegisterDto {
   @IsString()
   nombreCompleto: string;
@@ -11,6 +17,6 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @IsEnum(['admin', 'psychologist', 'patient'])
-  rol: 'admin' | 'psychologist' | 'patient';
+  @IsEnum(Rol)
+  rol: Rol;
 }
