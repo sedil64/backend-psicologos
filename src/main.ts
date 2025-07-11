@@ -14,27 +14,28 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  // CORS configurado para frontend HTTPS desde NGINX
+  // CORS: permite dominios HTTPS servidos por NGINX o frontend local
   app.enableCors({
-  origin: [
-    'https://resultados-deportivos-backend.desarrollo-software.xyz',
-    'https://desarrollo-software.xyz',
-    'http://localhost:5173', // solo si sigues probando localmente
-  ],
+    origin: [
+      'https://resultados-deportivos-backend.desarrollo-software.xyz', // backend detrás de NGINX
+      'https://desarrollo-software.xyz', // posible frontend
+      'http://localhost:5173', // desarrollo local
+    ],
     credentials: true,
   });
 
   // Validación global de DTOs
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
 
-  // Guards de autenticación y roles
+  // Guards globales para JWT y control de roles
   const reflector = app.get(Reflector);
   app.useGlobalGuards(
     new JwtAuthGuard(reflector),
     new RolesGuard(reflector)
   );
 
-  // Escucha desde todas las interfaces (VPS y proxy)
+  // Escucha externa en VPS o contenedor
   await app.listen(process.env.PORT || 3006, '0.0.0.0');
 }
+
 bootstrap();
