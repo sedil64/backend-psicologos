@@ -14,7 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:5173', // ajusta si tu frontend usa otra IP o puerto
+    origin: ['http://localhost:5173', 'http://65.38.96.125:5173'],
     credentials: true,
   });
 
@@ -26,6 +26,6 @@ async function bootstrap() {
     new RolesGuard(reflector)
   );
 
-  await app.listen(process.env.PORT || 3006, '0.0.0.0'); // permite acceso externo en VPS
+  await app.listen(process.env.PORT || 3006, '0.0.0.0'); 
 }
 bootstrap();
