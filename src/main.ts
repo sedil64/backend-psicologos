@@ -14,21 +14,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:5173', // ajusta si tu frontend usa otra IP o puerto
     credentials: true,
   });
 
-  // Validación global de DTOs
   app.useGlobalPipes(new ValidationPipe());
 
-  // Guards globales para roles y JWT
   const reflector = app.get(Reflector);
-/*  app.useGlobalGuards(
+  app.useGlobalGuards(
     new JwtAuthGuard(reflector),
     new RolesGuard(reflector)
   );
 
-  */
-  await app.listen(process.env.PORT || 3006);
+  await app.listen(process.env.PORT || 3006, '0.0.0.0'); // permite acceso externo en VPS
 }
 bootstrap();
