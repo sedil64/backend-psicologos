@@ -1,4 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { Rol } from '../../auth/dto/register.dto';
 
 export class CreateUsuarioDto {
   @IsString()

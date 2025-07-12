@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from './usuarios.entity';
@@ -13,12 +17,31 @@ export class UsuariosService {
   ) {}
 
   async create(dto: CreateUsuarioDto) {
+    // 🔍 Verificar si ya existe el correo
     const existe = await this.repo.findOne({ where: { email: dto.email } });
-    if (existe) throw new BadRequestException('El correo ya está registrado');
+    if (existe) {
+      throw new BadRequestException('El correo ya está registrado');
+    }
 
-    const hash = await bcrypt.hash(dto.password, 10);
-    const nuevo = this.repo.create({ ...dto, password: hash });
-    return this.repo.save(nuevo);
+    try {
+      // 🔐 Hashear contraseña
+      const hash = await bcrypt.hash(dto.password, 10);
+
+      // 🧱 Crear entidad usuario
+      const nuevo = this.repo.create({ ...dto, password: hash });
+
+      // 💾 Guardar usuario en base de datos
+      const guardado = await this.repo.save(nuevo);
+
+      if (!guardado?.id) {
+        throw new InternalServerErrorException('Error al guardar el usuario');
+      }
+
+      return guardado;
+    } catch (err) {
+      console.error('Error en UsuariosService.create:', err);
+      throw new InternalServerErrorException('No se pudo crear el usuario');
+    }
   }
 
   findAll() {
