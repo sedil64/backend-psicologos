@@ -12,6 +12,8 @@ import { ServiciosModule } from './servicios/servicios.module';
 import { CitasModule } from './citas/citas.module';
 import { AuthModule } from './auth/auth.module';
 import { LogsModule } from './logs/logs.module';
+import { PsicologosModule } from './psicologos/psicologos.module';
+import { PacientesModule } from './pacientes/pacientes.module';
 
 @Module({
   imports: [
@@ -45,6 +47,9 @@ import { LogsModule } from './logs/logs.module';
     CitasModule,
     AuthModule,
     LogsModule,
+    PsicologosModule,
+    PacientesModule
+
   ],
   controllers: [AppController],
   providers: [AppService],
