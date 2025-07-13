@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from './usuarios.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsuariosService {
@@ -23,19 +22,9 @@ export class UsuariosService {
     }
 
     try {
-      // 🔐 Hashear contraseña
-      const hash = await bcrypt.hash(dto.password, 10);
-
-      // 🧱 Crear entidad usuario
-      const nuevo = this.repo.create({
-        ...dto,
-        password: hash,
-      });
-
-      // 💾 Guardar usuario en base de datos
+      const nuevo = this.repo.create(dto);
       const guardado = await this.repo.save(nuevo);
 
-      // ✅ Validar que el usuario fue persistido correctamente
       if (!guardado?.id || !guardado.email || !guardado.password) {
         console.error('❌ Usuario no se guardó correctamente:', guardado);
         throw new InternalServerErrorException('Error al guardar el usuario en la base de datos');
