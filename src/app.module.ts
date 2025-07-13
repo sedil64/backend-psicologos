@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -6,7 +7,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-// Módulos personalizados
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { ServiciosModule } from './servicios/servicios.module';
 import { CitasModule } from './citas/citas.module';
@@ -15,15 +15,16 @@ import { LogsModule } from './logs/logs.module';
 import { PsicologosModule } from './psicologos/psicologos.module';
 import { PacientesModule } from './pacientes/pacientes.module';
 
+// Guards globales
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { RolesGuard } from './common/guards/roles.guard';
+
 @Module({
   imports: [
-    // Configuración global de variables de entorno
     ConfigModule.forRoot({ isGlobal: true }),
 
-    // Conexión a MongoDB (Atlas)
     MongooseModule.forRoot(process.env.MONGO_URI || ''),
 
-    // Conexión a PostgreSQL (Neon)
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -49,9 +50,20 @@ import { PacientesModule } from './pacientes/pacientes.module';
     LogsModule,
     PsicologosModule,
     PacientesModule
-
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+
+    // ✅ Guards inyectados correctamente por NestJS
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -27,13 +27,6 @@ async function bootstrap() {
   // Validación global de DTOs
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
 
-  // Guards globales para JWT y control de roles
-  const reflector = app.get(Reflector);
-  app.useGlobalGuards(
-    new JwtAuthGuard(reflector),
-    new RolesGuard(reflector)
-  );
-
   // Escucha externa en VPS o contenedor
   await app.listen(process.env.PORT || 3006, '0.0.0.0');
 }
