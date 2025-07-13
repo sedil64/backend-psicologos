@@ -1,17 +1,29 @@
-import { Controller, Post, Get, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { PsicologosService } from './psicologos.service';
 import { CreatePsicologoDto } from './dto/create-psicologo.dto';
-import { Usuario } from '../usuarios/usuarios.entity'; // Se asigna desde AuthService en práctica real
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard'; // ✅ importar el guard
+import { Request } from 'express';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
+@UseGuards(JwtAuthGuard) // ✅ protección global para todas las rutas
 @Controller('psicologos')
 export class PsicologosController {
   constructor(private readonly service: PsicologosService) {}
 
   @Post()
-  async create(@Body() dto: CreatePsicologoDto): Promise<any> {
-    const usuario = new Usuario(); // ⚠️ A reemplazar con lógica real de AuthService
-    return this.service.create(dto, usuario);
-  }
+  async create(@Body() dto: CreatePsicologoDto, @Req() req: RequestWithUser): Promise<any> {
+    const usuario = req.user;
+    return this.service.create(dto, usuario); 
+ }
 
   @Get()
   async findAll() {
