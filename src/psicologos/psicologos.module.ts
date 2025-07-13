@@ -1,7 +1,7 @@
 // src/psicologos/psicologos.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Psicologo } from './psicologo.entity';
+import { Psicologo } from './psicologos.entity';
 import { PsicologosService } from './psicologos.service';
 import { PsicologosController } from './psicologos.controller';
 import { CertificacionesModule } from '../certificaciones/certificaciones.module'; // 👈 Importar MongoModule

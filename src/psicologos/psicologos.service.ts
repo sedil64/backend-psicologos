@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Psicologo } from './psicologo.entity';
+import { Psicologo } from './psicologos.entity';
 import { Repository } from 'typeorm';
 import { CreatePsicologoDto } from './dto/create-psicologo.dto';
 import { Usuario } from '../usuarios/usuarios.entity';

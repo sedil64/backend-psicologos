@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Psicologo } from '../psicologos/psicologo.entity';
+import { Psicologo } from '../psicologos/psicologos.entity';
 
 @Entity('citas')
 export class Cita {

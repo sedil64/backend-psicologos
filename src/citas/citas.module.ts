@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cita } from './citas.entity';
 import { CitasService } from './citas.service';
 import { CitasController } from './citas.controller';
-import { Psicologo } from '../psicologos/psicologo.entity';
+import { Psicologo } from '../psicologos/psicologos.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Cita, Psicologo])],
