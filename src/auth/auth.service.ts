@@ -12,9 +12,22 @@ export class AuthService {
     private usuariosService: UsuariosService,
   ) {}
 
+  /**
+   * Registra un nuevo usuario
+   * - Hashea la contraseña antes de guardarla
+   * - Persiste el usuario en PostgreSQL
+   * - Genera y retorna un token JWT
+   */
   async register(dto: RegisterDto) {
     const hash = await bcrypt.hash(dto.password, 10);
-    const usuario = await this.usuariosService.create({ ...dto, password: hash });
+
+    // 🔐 Se delega el guardado con la contraseña hasheada
+    const usuario = await this.usuariosService.create({
+      ...dto,
+      password: hash,
+    });
+
+    // ⚠️ Se puede agregar validación: if (!usuario?.id) throw new Error(...)
 
     const payload = {
       sub: usuario.id,
@@ -22,6 +35,7 @@ export class AuthService {
       role: usuario.rol,
     };
 
+    // 🧾 Log para confirmar datos del token en consola
     console.log('✅ Registro exitoso. Payload:', payload);
 
     return {
@@ -29,14 +43,26 @@ export class AuthService {
     };
   }
 
+  /**
+   * Valida credenciales de usuario
+   * - Busca por email
+   * - Compara contraseña con bcrypt
+   * - Genera token si es válido
+   */
   async login(dto: LoginDto) {
+    // 📨 Verifica qué DTO se recibe
+    console.log('📨 DTO recibido en login:', dto);
+
     const user = await this.usuariosService.findByEmail(dto.email);
     console.log('🔍 Usuario encontrado en login:', user);
 
-    const isValidPassword = user && await bcrypt.compare(dto.password, user.password);
+    // ⚠️ Se asegura que el usuario exista y la contraseña sea válida
+    const isValidPassword =
+      user && (await bcrypt.compare(dto.password, user.password));
     console.log('🔐 ¿Contraseña válida?', isValidPassword);
 
     if (!user || !isValidPassword) {
+      console.error('⛔ Falla de autenticación: usuario inválido o contraseña incorrecta');
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
