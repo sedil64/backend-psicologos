@@ -10,37 +10,47 @@ import {
 } from '@nestjs/common';
 import { PsicologosService } from './psicologos.service';
 import { CreatePsicologoDto } from './dto/create-psicologo.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard'; // ✅ importar el guard
-import { Request } from 'express';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
-@UseGuards(JwtAuthGuard) // ✅ protección global para todas las rutas
 @Controller('psicologos')
 export class PsicologosController {
   constructor(private readonly service: PsicologosService) {}
 
   @Post()
-  async create(@Body() dto: CreatePsicologoDto, @Req() req: RequestWithUser): Promise<any> {
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  async create(
+    @Body() dto: CreatePsicologoDto,
+    @Req() req: RequestWithUser,
+  ): Promise<any> {
     const usuario = req.user;
-    return this.service.create(dto, usuario); 
- }
+    return this.service.create(dto, usuario);
+  }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   async findAll() {
     return this.service.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: number) {
     return this.service.findById(id);
   }
 
   @Get('perfil/:id')
+  @UseGuards(JwtAuthGuard)
   async getPerfil(@Param('id') id: number) {
     return this.service.getPerfilCompleto(id);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async remove(@Param('id') id: number) {
     return this.service.delete(id);
   }
