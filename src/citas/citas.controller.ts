@@ -1,23 +1,34 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Patch, Delete } from '@nestjs/common';
 import { CitasService } from './citas.service';
 import { CreateCitaDto } from './dto/create-cita.dto';
+import { UpdateCitaDto } from './dto/update-cita.dto';
 
 @Controller('citas')
 export class CitasController {
-  constructor(private readonly citasService: CitasService) {}
+  constructor(private readonly service: CitasService) {}
 
   @Post()
-  create(@Body() dto: CreateCitaDto) {
-    return this.citasService.create(dto);
+  crear(@Body() dto: CreateCitaDto) {
+    return this.service.crear(dto);
   }
 
   @Get()
-  findAll() {
-    return this.citasService.findAll();
+  todas() {
+    return this.service.todas();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.citasService.findOne(id);
+  porId(@Param('id') id: number) {
+    return this.service.porId(id);
+  }
+
+  @Patch(':id')
+  actualizar(@Param('id') id: number, @Body() dto: UpdateCitaDto) {
+    return this.service.actualizar(id, dto);
+  }
+
+  @Delete(':id')
+  eliminar(@Param('id') id: number) {
+    return this.service.eliminar(id);
   }
 }

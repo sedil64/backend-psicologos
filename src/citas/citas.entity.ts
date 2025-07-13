@@ -1,5 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Usuario } from '../usuarios/usuarios.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Psicologo } from '../psicologos/psicologo.entity';
 
 @Entity('citas')
 export class Cita {
@@ -12,9 +18,14 @@ export class Cita {
   @Column()
   fecha: Date;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: ['pendiente', 'confirmada', 'cancelada'],
+    default: 'pendiente',
+  })
   estado: 'pendiente' | 'confirmada' | 'cancelada';
 
-  @ManyToOne(() => Usuario)
-  psicologo: Usuario;
+  @ManyToOne(() => Psicologo, { eager: true })
+  @JoinColumn()
+  psicologo: Psicologo;
 }

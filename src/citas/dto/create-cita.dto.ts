@@ -1,15 +1,15 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsString, IsInt } from 'class-validator';
+import { IsString, IsDateString, IsEnum, IsNumber } from 'class-validator';
 
 export class CreateCitaDto {
   @IsString()
   nombreCliente: string;
 
   @IsDateString()
-  fecha: string;
+  fecha: Date;
 
   @IsEnum(['pendiente', 'confirmada', 'cancelada'])
   estado: 'pendiente' | 'confirmada' | 'cancelada';
 
-  @IsInt()
+  @IsNumber()
   psicologoId: number;
 }
