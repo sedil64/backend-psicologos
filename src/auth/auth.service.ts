@@ -32,7 +32,7 @@ export class AuthService {
     const payload = {
       sub: usuario.id,
       email: usuario.email,
-      role: usuario.rol,
+      rol: usuario.rol,
     };
 
     // 🧾 Log para confirmar datos del token en consola
