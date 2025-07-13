@@ -15,13 +15,23 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
-    if (!requiredRoles) {
-      return true;
-    }
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    return requiredRoles.includes(user?.rol);
+    // 🧠 Logs de diagnóstico
+    console.log('🛡️ Roles requeridos para la ruta:', requiredRoles);
+    console.log('🔎 Usuario autenticado:', user);
+    console.log('🔍 Rol en req.user:', user?.rol);
+
+    if (!requiredRoles) {
+      console.log('✅ No se requieren roles. Permiso concedido.');
+      return true;
+    }
+
+    const tienePermiso = requiredRoles.includes(user?.rol);
+    console.log(`🔐 ¿Rol permitido? ${tienePermiso ? 'Sí' : 'No'}`);
+
+    return tienePermiso;
   }
 }
