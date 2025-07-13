@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  ExecutionContext,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, ExecutionContext, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 
@@ -10,12 +6,13 @@ import { Reflector } from '@nestjs/core';
 export class JwtAuthGuard extends AuthGuard('jwt') {
   private readonly logger = new Logger('JwtAuthGuard');
 
-  constructor(private readonly reflector: Reflector) {
-    super();
-  }
+  // ✅ Nest inyectará Reflector aquí sin constructor manual
+  private reflector: Reflector;
 
   canActivate(context: ExecutionContext) {
-    const isPublic = this.reflector.get<boolean>('isPublic', context.getHandler());
+    // 👇 Se obtiene reflector desde contexto en tiempo de ejecución
+    const reflector = this.reflector ?? new Reflector();
+    const isPublic = reflector.get<boolean>('isPublic', context.getHandler());
 
     if (isPublic) {
       this.logger.debug('🔓 Ruta pública detectada, omitiendo JWT');
