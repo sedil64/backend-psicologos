@@ -12,5 +12,6 @@ import { CertificacionesController } from './certificaciones.controller';
   ],
   providers: [CertificacionesService],
   controllers: [CertificacionesController],
+  exports: [CertificacionesService],
 })
 export class CertificacionesModule {}
