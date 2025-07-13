@@ -27,6 +27,10 @@ export class PsicologosController {
     @Req() req: RequestWithUser,
   ): Promise<any> {
     const usuario = req.user;
+
+    // 🧠 Log para ver qué usuario accede a la creación
+    console.log('🧑‍⚕️ Usuario en psicologos.controller.ts:', usuario);
+
     return this.service.create(dto, usuario);
   }
 
