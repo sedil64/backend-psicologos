@@ -10,7 +10,7 @@ export class CreateCertificacionDto {
 
   @IsOptional()
   @IsDateString()
-  fechaExpedicion?: string;
+  fechaExpedicion?: Date;
 
   @IsOptional()
   @IsString()

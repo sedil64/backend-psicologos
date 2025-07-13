@@ -4,7 +4,7 @@ import { Psicologo } from './psicologo.entity';
 import { Repository } from 'typeorm';
 import { CreatePsicologoDto } from './dto/create-psicologo.dto';
 import { Usuario } from '../usuarios/usuarios.entity';
-import { CertificacionesService } from '../certificaciones/certificaciones.service'; // Mongo
+import { CertificacionesService } from '../certificaciones/certificaciones.service';
 
 @Injectable()
 export class PsicologosService {
@@ -12,11 +12,11 @@ export class PsicologosService {
     @InjectRepository(Psicologo)
     private readonly repo: Repository<Psicologo>,
 
-    private readonly certService: CertificacionesService, // MongoDB service
+    private readonly certService: CertificacionesService,
   ) {}
 
   /**
-   * 🧾 Crea perfil psicólogo extendido
+   * 🧾 Crea un psicólogo vinculado a usuario
    */
   async create(dto: CreatePsicologoDto, usuario: Usuario): Promise<Psicologo> {
     const nuevo = this.repo.create({ ...dto, usuario });
@@ -24,26 +24,28 @@ export class PsicologosService {
   }
 
   /**
-   * 🔍 Retorna todos los psicólogos con su usuario
+   * 🔍 Lista todos los psicólogos
    */
   async findAll(): Promise<Psicologo[]> {
     return this.repo.find({ relations: ['usuario'] });
   }
 
   /**
-   * 🔍 Busca por ID y retorna el psicólogo con su usuario
+   * 📄 Consulta por ID con validación
    */
   async findById(id: number): Promise<Psicologo> {
-    return this.repo.findOne({ where: { id }, relations: ['usuario'] });
+    const psicologo = await this.repo.findOne({ where: { id }, relations: ['usuario'] });
+    if (!psicologo) {
+      throw new NotFoundException(`Psicólogo con ID ${id} no encontrado`);
+    }
+    return psicologo;
   }
 
   /**
-   * 🧠 Retorna el perfil completo con certificaciones (MongoDB)
+   * 🧠 Perfil combinado con certificaciones (MongoDB)
    */
   async getPerfilCompleto(id: number): Promise<any> {
     const psicologo = await this.findById(id);
-    if (!psicologo) throw new NotFoundException('Psicólogo no encontrado');
-
     const mongoDoc = await this.certService.obtenerPorPsicologo(id);
 
     return {
@@ -53,7 +55,7 @@ export class PsicologosService {
   }
 
   /**
-   * 🗑️ Elimina el psicólogo de PostgreSQL
+   * 🗑️ Elimina el psicólogo
    */
   async delete(id: number): Promise<void> {
     await this.repo.delete(id);

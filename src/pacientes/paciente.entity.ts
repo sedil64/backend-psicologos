@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Usuario } from '../usuarios/usuarios.entity';
+import { Genero } from '../common/enums/genero.enum';
 
 @Entity('pacientes')
 export class Paciente {

@@ -15,7 +15,10 @@ export class CertificacionesService {
     const registro = await this.certModel.findOne({ psicologoId });
 
     if (registro) {
-      registro.certificaciones.push(dto);
+      registro.certificaciones.push({
+  ...dto,
+  fechaExpedicion: dto.fechaExpedicion ? new Date(dto.fechaExpedicion) : undefined,
+});
       return registro.save();
     }
 
