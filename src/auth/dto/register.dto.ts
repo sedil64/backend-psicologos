@@ -1,22 +1,13 @@
-import { IsEmail, IsString, MinLength, IsEnum } from 'class-validator';
-
-export enum Rol {
-  Admin = 'admin',
-  Psychologist = 'psychologist',
-  Patient = 'patient',
-}
+import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
+import { Role } from '../entities/account.entity';
 
 export class RegisterDto {
-  @IsString()
-  nombreCompleto: string;
-
   @IsEmail()
   email: string;
 
-  @IsString()
   @MinLength(6)
   password: string;
 
-  @IsEnum(Rol)
-  rol: Rol;
+  @IsEnum(['admin','psicologo','paciente'])
+  role: Role;
 }
