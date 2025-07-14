@@ -1,3 +1,4 @@
+// src/common/guards/roles.guard.ts
 import {
   CanActivate,
   ExecutionContext,
@@ -18,19 +19,20 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
+    const userRole = user?.role;          // ← ya no 'rol'
 
-    // Logs para depuración
+    // Logs actualizados
     console.log('🛡️ Roles requeridos para la ruta:', requiredRoles);
     console.log('🔎 Usuario autenticado:', user);
-    console.log('🔍 Rol en req.user:', user?.rol);
+    console.log('🔍 Role en req.user:', userRole);
 
     if (!requiredRoles) {
       console.log('✅ No se requieren roles. Permiso concedido.');
       return true;
     }
 
-    const tienePermiso = requiredRoles.includes(user?.rol);
-    console.log(`🔐 ¿Rol permitido? ${tienePermiso ? 'Sí' : 'No'}`);
+    const tienePermiso = requiredRoles.includes(userRole);
+    console.log(`🔐 ¿Role permitido? ${tienePermiso ? 'Sí' : 'No'}`);
 
     return tienePermiso;
   }
