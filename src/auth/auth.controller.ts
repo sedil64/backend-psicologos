@@ -23,6 +23,7 @@ export class AuthController {
   @Public()
   @Post('register')
   async register(@Body() dto: RegisterDto) {
+    console.log('📨 DTO recibido en register:', dto);
     return this.authService.register(dto);
   }
 
@@ -32,16 +33,19 @@ export class AuthController {
   @Public()
   @Post('login')
   async login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+    console.log('📨 DTO recibido en login:', dto);
+    const token = await this.authService.login(dto);
+    console.log('🎟️ Token generado en login:', token);
+    return token;
   }
 
   /**
    * Diagnóstico - obtener datos del usuario autenticado
    */
-  @Get('me')
   @UseGuards(JwtAuthGuard)
+  @Get('me')
   getMe(@Req() req: RequestWithUser) {
-    console.log('🔍 Usuario autenticado:', req.user); // Log útil para PM2
+    console.log('🔍 Usuario autenticado en /auth/me:', req.user);
     return req.user;
   }
 }
