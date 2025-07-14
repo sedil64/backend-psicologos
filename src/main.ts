@@ -29,7 +29,8 @@ async function bootstrap() {
     ],
     methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
     allowedHeaders: ['Content-Type','Authorization'],
-    credentials: true,  // solo si ENVIAS cookies o auth basada en sesión
+    credentials: true,
+    transform: true,  // solo si ENVIAS cookies o auth basada en sesión
   });
 
   // Valida los DTOs globally
