@@ -16,7 +16,7 @@ import { PsicologosModule } from './psicologos/psicologos.module';
 import { PacientesModule } from './pacientes/pacientes.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
-import { RolesGuard } from './common/guards/roles.guard';
+// Importa RolesGuard pero NO lo registramos como global
 
 @Module({
   imports: [
@@ -54,12 +54,7 @@ import { RolesGuard } from './common/guards/roles.guard';
       useFactory: (reflector: Reflector) => new JwtAuthGuard(reflector),
       inject: [Reflector],
     },
-    {
-      provide: APP_GUARD,
-      useFactory: (reflector: Reflector) => new RolesGuard(reflector),
-      inject: [Reflector],
-    },
+    // NO poner RolesGuard aquí como APP_GUARD
   ],
-
 })
 export class AppModule {}
