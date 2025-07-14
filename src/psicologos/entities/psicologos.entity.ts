@@ -8,7 +8,8 @@ import {
 } from 'typeorm';
 import { Account } from '../../auth/entities/account.entity';
 import { Genero } from '../../common/enums/genero.enum';
-import { Cita } from '../../citas/entities/citas.entity';   // ← importa Cita
+import { Cita } from '../../citas/entities/citas.entity';
+import { FotoPsicologo } from '../../photo/entity/foto-psicologo.entity';
 
 @Entity('psicologos')
 export class Psicologo {
@@ -65,6 +66,13 @@ export class Psicologo {
   @Column({ nullable: true })
   certificaciones: string;
 
+  @Column({ default: true })
+  activo: boolean;
+
+  @OneToMany(() => FotoPsicologo, foto => foto.psicologo)
+  fotos: FotoPsicologo[];
+
   @OneToMany(() => Cita, cita => cita.psicologo, { cascade: true })
   citas: Cita[];
+
 }

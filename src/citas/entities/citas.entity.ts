@@ -4,40 +4,56 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Psicologo } from '../../psicologos/entities/psicologos.entity';
-import { Paciente }   from '../../pacientes/entities/paciente.entity';
+import { Paciente } from '../../pacientes/entities/paciente.entity';
 
-export type EstadoCita = 'pendiente' | 'confirmada' | 'cancelada';
+export enum EstadoCita {
+  Pendiente   = 'pendiente',
+  Confirmada  = 'confirmada',
+  Cancelada   = 'cancelada',
+}
 
 @Entity('citas')
 export class Cita {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ length: 150 })
   nombreCliente: string;
 
-  // Cambiado a Date para que TypeORM lo mapee a JS Date
   @Column({ type: 'date' })
   fecha: Date;
 
-  // Hora como tiempo en DB, sigue siendo string en TS
   @Column({ type: 'time' })
   hora: string;
 
   @Column({
     type: 'enum',
-    enum: ['pendiente', 'confirmada', 'cancelada'],
-    default: 'pendiente',
+    enum: EstadoCita,
+    default: EstadoCita.Pendiente,
   })
   estado: EstadoCita;
 
-  @ManyToOne(() => Psicologo, psicologo => psicologo.citas, { eager: true })
-  @JoinColumn()
+  @ManyToOne(() => Psicologo, p => p.citas, {
+    eager: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'psicologo_id' })
   psicologo: Psicologo;
 
-  @ManyToOne(() => Paciente, pac => pac.citas, { eager: true })
-  @JoinColumn()
+  @ManyToOne(() => Paciente, p => p.citas, {
+    eager: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'paciente_id' })
   paciente: Paciente;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

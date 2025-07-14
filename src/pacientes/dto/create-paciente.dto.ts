@@ -1,11 +1,10 @@
-// src/pacientes/dto/create-paciente.dto.ts
-
 import {
   IsString,
   IsDateString,
   IsEnum,
   IsNumber,
   IsOptional,
+  IsBoolean,
 } from 'class-validator';
 import { Genero } from '../../common/enums/genero.enum';
 
@@ -21,4 +20,8 @@ export class CreatePacienteDto {
   @IsOptional() @IsString() direccion?: string;
   @IsNumber() edad: number;
   @IsOptional() @IsString() antecedentesClinicos?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  activo?: boolean;     // nuevo campo validado como booleano
 }
