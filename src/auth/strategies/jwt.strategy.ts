@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JwtPayload } from '../interfaces/jwt-payload.interface'; // Asegúrate que exista
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -16,15 +16,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload) {
-    this.logger.debug('🎯 Payload recibido en JwtStrategy:', payload);
-
     const user = {
       id: payload.sub,
       email: payload.email,
       rol: payload.rol,
     };
 
-    this.logger.debug('✅ Usuario construido:', user);
+    this.logger.debug('✅ Usuario validado por JWT:', user);
     return user;
   }
 }
