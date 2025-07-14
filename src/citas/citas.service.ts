@@ -1,52 +1,84 @@
+// src/citas/citas.service.ts
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Cita } from './entities/citas.entity';
 import { Repository } from 'typeorm';
+
+import { Cita, EstadoCita } from './entities/citas.entity';
 import { CreateCitaDto } from './dto/create-cita.dto';
-import { UpdateCitaDto } from './dto/update-cita.dto';
-import { Psicologo } from '../psicologos/entities/psicologos.entity';
+import { PsicologosService } from '../psicologos/psicologos.service';
 
 @Injectable()
 export class CitasService {
   constructor(
     @InjectRepository(Cita)
-    private readonly repo: Repository<Cita>,
+    private readonly citaRepo: Repository<Cita>,
 
-    @InjectRepository(Psicologo)
-    private readonly psicologoRepo: Repository<Psicologo>,
+    private readonly psicologosService: PsicologosService,
   ) {}
 
-  async crear(dto: CreateCitaDto): Promise<Cita> {
-    const psicologo = await this.psicologoRepo.findOne({ where: { id: dto.psicologoId } });
-    if (!psicologo) throw new NotFoundException('Psicólogo no encontrado');
+  /**
+   * Crea una nueva cita vinculada a un psicólogo existente
+   */
+  async create(dto: CreateCitaDto): Promise<Cita> {
+    // 1️⃣ Obtener psicólogo o lanzar 404
+    const psicologo = await this.psicologosService.findById(dto.psicologoId);
 
-    const nueva = this.repo.create({
+    // 2️⃣ Crear nueva cita
+    const nuevaCita = this.citaRepo.create({
       nombreCliente: dto.nombreCliente,
       fecha: dto.fecha,
-      estado: dto.estado,
+      hora: dto.hora,
       psicologo,
     });
 
-    return this.repo.save(nueva);
+    // 3️⃣ Persistir en la base de datos
+    return this.citaRepo.save(nuevaCita);
   }
 
-  async todas(): Promise<Cita[]> {
-    return this.repo.find();
+  /**
+   * Lista todas las citas con su psicólogo
+   */
+  async findAll(): Promise<Cita[]> {
+    return this.citaRepo.find({ relations: ['psicologo'] });
   }
 
-  async porId(id: number): Promise<Cita> {
-    const cita = await this.repo.findOne({ where: { id } });
-    if (!cita) throw new NotFoundException('Cita no encontrada');
+  /**
+   * Consulta una cita por ID
+   */
+  async findOne(id: number): Promise<Cita> {
+    const cita = await this.citaRepo.findOne({
+      where: { id },
+      relations: ['psicologo'],
+    });
+    if (!cita) {
+      throw new NotFoundException(`Cita con ID ${id} no encontrada`);
+    }
     return cita;
   }
 
-  async actualizar(id: number, dto: UpdateCitaDto): Promise<Cita> {
-    const cita = await this.porId(id);
-    Object.assign(cita, dto);
-    return this.repo.save(cita);
+  /**
+   * Cambia el estado de la cita a 'confirmada'
+   */
+  async confirmar(id: number): Promise<Cita> {
+    const cita = await this.findOne(id);
+    cita.estado = 'confirmada';
+    return this.citaRepo.save(cita);
   }
 
-  async eliminar(id: number): Promise<void> {
-    await this.repo.delete(id);
+  /**
+   * Cambia el estado de la cita a 'cancelada'
+   */
+  async cancelar(id: number): Promise<Cita> {
+    const cita = await this.findOne(id);
+    cita.estado = 'cancelada';
+    return this.citaRepo.save(cita);
+  }
+
+  /**
+   * Elimina una cita por ID
+   */
+  async remove(id: number): Promise<void> {
+    await this.citaRepo.delete(id);
   }
 }

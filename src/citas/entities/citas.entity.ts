@@ -17,10 +17,11 @@ export class Cita {
   @Column()
   nombreCliente: string;
 
+  // Cambiado a Date para que TypeORM lo mapee a JS Date
   @Column({ type: 'date' })
-  fecha: string;
+  fecha: Date;
 
-  // ← nuevo campo hora (tipo SQL TIME, guardado como string "HH:MM:SS")
+  // Hora como tiempo en DB, sigue siendo string en TS
   @Column({ type: 'time' })
   hora: string;
 

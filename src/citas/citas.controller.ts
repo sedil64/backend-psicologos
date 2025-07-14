@@ -1,34 +1,45 @@
-import { Controller, Post, Get, Param, Body, Patch, Delete } from '@nestjs/common';
+// src/citas/citas.controller.ts
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  NotFoundException,
+} from '@nestjs/common';
+
 import { CitasService } from './citas.service';
 import { CreateCitaDto } from './dto/create-cita.dto';
-import { UpdateCitaDto } from './dto/update-cita.dto';
+import { Cita } from './entities/citas.entity';
 
 @Controller('citas')
 export class CitasController {
-  constructor(private readonly service: CitasService) {}
+  constructor(private readonly citasService: CitasService) {}
 
   @Post()
-  crear(@Body() dto: CreateCitaDto) {
-    return this.service.crear(dto);
+  async create(
+    @Body() dto: CreateCitaDto,
+  ): Promise<Cita> {
+    return this.citasService.create(dto);
   }
 
   @Get()
-  todas() {
-    return this.service.todas();
+  async findAll(): Promise<Cita[]> {
+    return this.citasService.findAll();
   }
 
   @Get(':id')
-  porId(@Param('id') id: number) {
-    return this.service.porId(id);
+  async findOne(@Param('id') id: number): Promise<Cita> {
+    return this.citasService.findOne(id);
   }
 
-  @Patch(':id')
-  actualizar(@Param('id') id: number, @Body() dto: UpdateCitaDto) {
-    return this.service.actualizar(id, dto);
+  @Post(':id/confirmar')
+  async confirmar(@Param('id') id: number): Promise<Cita> {
+    return this.citasService.confirmar(id);
   }
 
-  @Delete(':id')
-  eliminar(@Param('id') id: number) {
-    return this.service.eliminar(id);
+  @Post(':id/cancelar')
+  async cancelar(@Param('id') id: number): Promise<Cita> {
+    return this.citasService.cancelar(id);
   }
 }

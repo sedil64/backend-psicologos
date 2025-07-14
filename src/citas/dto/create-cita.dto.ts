@@ -1,14 +1,15 @@
-import { IsString, IsDateString, IsEnum, IsNumber } from 'class-validator';
+// src/citas/dto/create-cita.dto.ts
+import { IsString, IsDateString, IsNumber } from 'class-validator';
 
 export class CreateCitaDto {
   @IsString()
   nombreCliente: string;
 
   @IsDateString()
-  fecha: Date;
+  fecha: Date;         // se validará como ISO string, pero TS lo trata como Date
 
-  @IsEnum(['pendiente', 'confirmada', 'cancelada'])
-  estado: 'pendiente' | 'confirmada' | 'cancelada';
+  @IsString()
+  hora: string;        // formato "HH:MM:SS"
 
   @IsNumber()
   psicologoId: number;
