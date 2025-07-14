@@ -1,11 +1,9 @@
+// src/main.ts
 import * as crypto from 'crypto';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
-import { RolesGuard } from './common/guards/roles.guard';
 
 async function bootstrap() {
   // polyfill para dependencias que usan global.crypto
@@ -17,39 +15,30 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
-  // MIDDLEWARE: loggeo de headers para depurar Authorization
+  // MIDDLEWARE de logging (opcional)
   app.use((req, res, next) => {
-    console.log('>> Incoming request:', req.method, req.url);
-    console.log('>> Headers.authorization:', req.headers.authorization);
+    console.log('>> Incoming:', req.method, req.url, req.headers.authorization);
     next();
   });
 
-  // CORS permitido (ajusta orígenes según necesites)
+  // CORS: SOLO el dominio de tu FRONTEND, no el backend
   app.enableCors({
     origin: [
-      'https://resultados-deportivos-backend.desarrollo-software.xyz',
-      'https://desarrollo-software.xyz',
-      'http://localhost:5173',
+      'http://localhost:5173',                 // desarrollo
+      'https://desarrollo-software.xyz',       // tu front en prod
     ],
-    credentials: true,
+    methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization'],
+    credentials: true,  // solo si ENVIAS cookies o auth basada en sesión
   });
 
-  // Pipes globales para validar DTOs
+  // Valida los DTOs globally
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
 
-  // Si quisieras activar el guard globalmente, descomenta:
-  // const reflector = app.get(Reflector);
-  // app.useGlobalGuards(
-  //   new JwtAuthGuard(reflector),
-  //   new RolesGuard(reflector),
-  // );
-
-  // Levanta servidor en todas las interfaces
   const port = process.env.PORT || 3006;
   await app.listen(port, '0.0.0.0');
-  console.log(`🚀 Application is running on: http://0.0.0.0:${port}`);
+  console.log(`🚀 Server listening on http://0.0.0.0:${port}`);
 }
-
 bootstrap();
