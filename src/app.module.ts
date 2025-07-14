@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { LogsModule } from './logs/logs.module';
 import { PsicologosModule } from './psicologos/psicologos.module';
 import { PacientesModule } from './pacientes/pacientes.module';
+import { AdminModule } from './admin/admin.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 // Importa RolesGuard pero NO lo registramos como global
@@ -45,6 +46,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     LogsModule,
     PsicologosModule,
     PacientesModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

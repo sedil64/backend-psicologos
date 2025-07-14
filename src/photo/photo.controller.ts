@@ -10,6 +10,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { PhotoService } from './photo.service';
 import { Express } from 'express';
+import { existsSync, mkdirSync } from 'fs';
 
 @Controller('photos')
 export class PhotoController {
@@ -19,7 +20,13 @@ export class PhotoController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads/fotos-psicologos',
+        destination: (req, file, callback) => {
+          const uploadPath = './uploads/fotos-psicologos';
+          if (!existsSync(uploadPath)) {
+            mkdirSync(uploadPath, { recursive: true });
+          }
+          callback(null, uploadPath);
+        },
         filename: (req, file, callback) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
