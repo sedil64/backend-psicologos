@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+// Módulos funcionales
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { ServiciosModule } from './servicios/servicios.module';
 import { CitasModule } from './citas/citas.module';
@@ -54,7 +55,16 @@ import { RolesGuard } from './common/guards/roles.guard';
   controllers: [AppController],
   providers: [
     AppService,
-    
+
+    // ✅ Activación de guards globales
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}
