@@ -1,5 +1,4 @@
 // src/auth/auth.module.ts
-
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
@@ -22,8 +21,8 @@ import { Account } from './entities/account.entity';
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
   exports: [
-    AuthService,   // ahora disponible para otros módulos
-    JwtStrategy,   // opcional, si otros módulos necesitan validación JWT
+    AuthService,   // ← IMPORTANTE: exportar AuthService
+    JwtStrategy,   // ← opcional si otros módulos lo necesitan
   ],
 })
 export class AuthModule {}
