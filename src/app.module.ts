@@ -49,19 +49,17 @@ import { RolesGuard } from './common/guards/roles.guard';
   controllers: [AppController],
   providers: [
     AppService,
-
-    // ✅ Guard global de JWT con Reflector correctamente inyectado
     {
       provide: APP_GUARD,
       useFactory: (reflector: Reflector) => new JwtAuthGuard(reflector),
       inject: [Reflector],
     },
-
-    // ✅ Guard de roles también global
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
+      useFactory: (reflector: Reflector) => new RolesGuard(reflector),
+      inject: [Reflector],
     },
   ],
+
 })
 export class AppModule {}
