@@ -1,3 +1,5 @@
+// src/auth/auth.module.ts
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
@@ -15,12 +17,13 @@ import { Account } from './entities/account.entity';
       secret: process.env.JWT_SECRET || 'secret_key',
       signOptions: { expiresIn: '1d' },
     }),
-
-    // Aquí usamos Account, no UsuariosModule
     TypeOrmModule.forFeature([Account]),
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [JwtStrategy],
+  exports: [
+    AuthService,   // ahora disponible para otros módulos
+    JwtStrategy,   // opcional, si otros módulos necesitan validación JWT
+  ],
 })
 export class AuthModule {}
