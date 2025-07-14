@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JwtPayload } from '../interfaces/jwt-payload.interface'; // Crea esta interfaz si aún no existe
+import { JwtPayload } from '../interfaces/jwt-payload.interface'; // Asegúrate que exista
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -11,14 +11,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
   async validate(payload: JwtPayload) {
     this.logger.debug('🎯 Payload recibido en JwtStrategy:', payload);
 
-    // Asegúrate que el token tenga "rol" y no "role"
     const user = {
       id: payload.sub,
       email: payload.email,

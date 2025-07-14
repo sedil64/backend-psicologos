@@ -12,7 +12,10 @@ async function bootstrap() {
     (global as any).crypto = crypto;
   }
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
+  
 
   // CORS: permite dominios HTTPS servidos por NGINX o frontend local
   app.enableCors({
