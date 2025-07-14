@@ -1,7 +1,7 @@
 // src/common/interfaces/request-with-user.interface.ts
 import { Request } from 'express';
-import { Usuario } from '../../usuarios/usuarios.entity';
+import { Account } from '../../auth/entities/account.entity';
 
 export interface RequestWithUser extends Request {
-  user: Usuario;
+  user: Account;
 }

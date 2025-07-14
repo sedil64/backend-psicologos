@@ -18,17 +18,30 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /**
-   * Registro de usuario - acceso público sin JWT
+   * Registro de cuenta - crea un Account (email/password/role)
    */
   @Public()
   @Post('register')
   async register(@Body() dto: RegisterDto) {
     console.log('📨 DTO recibido en register:', dto);
-    return this.authService.register(dto);
+    const account = await this.authService.register(dto);
+    console.log('✅ Cuenta creada:', {
+      id: account.id,
+      email: account.email,
+      role: account.role,
+      createdAt: account.createdAt,
+    });
+    // No devolvemos el password por seguridad
+    return {
+      id: account.id,
+      email: account.email,
+      role: account.role,
+      createdAt: account.createdAt,
+    };
   }
 
   /**
-   * Login de usuario - acceso público sin JWT
+   * Login de cuenta - devuelve JWT con payload { sub, email, role }
    */
   @Public()
   @Post('login')
@@ -40,7 +53,7 @@ export class AuthController {
   }
 
   /**
-   * Diagnóstico - obtener datos del usuario autenticado
+   * Obtiene datos de la cuenta autenticada
    */
   @UseGuards(JwtAuthGuard)
   @Get('me')

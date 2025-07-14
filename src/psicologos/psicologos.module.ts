@@ -1,15 +1,21 @@
 // src/psicologos/psicologos.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Psicologo } from './psicologos.entity';
+
+import { AuthModule } from '../auth/auth.module';
+import { CertificacionesModule } from '../certificaciones/certificaciones.module';
+
+import { Psicologo } from './entities/psicologos.entity';
+import { Account } from '../auth/entities/account.entity';
+
 import { PsicologosService } from './psicologos.service';
 import { PsicologosController } from './psicologos.controller';
-import { CertificacionesModule } from '../certificaciones/certificaciones.module'; // 👈 Importar MongoModule
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Psicologo]),
-    CertificacionesModule, // 👈 Aquí habilitas el acceso a certificaciones
+    TypeOrmModule.forFeature([Psicologo, Account]),
+    AuthModule,
+    CertificacionesModule,
   ],
   providers: [PsicologosService],
   controllers: [PsicologosController],

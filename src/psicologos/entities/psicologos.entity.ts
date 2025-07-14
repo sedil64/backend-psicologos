@@ -3,20 +3,21 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
+  OneToMany,    // ← importa OneToMany
   JoinColumn,
 } from 'typeorm';
-import { Usuario } from '../usuarios/usuarios.entity';
-import { Genero } from '../common/enums/genero.enum';
-
+import { Account } from '../../auth/entities/account.entity';
+import { Genero } from '../../common/enums/genero.enum';
+import { Cita } from '../../citas/entities/citas.entity';   // ← importa Cita
 
 @Entity('psicologos')
 export class Psicologo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Usuario, { cascade: true })
+  @OneToOne(() => Account, { cascade: true })
   @JoinColumn()
-  usuario: Usuario;
+  account: Account;
 
   @Column()
   nombres: string;
@@ -63,4 +64,7 @@ export class Psicologo {
 
   @Column({ nullable: true })
   certificaciones: string;
+
+  @OneToMany(() => Cita, cita => cita.psicologo, { cascade: true })
+  citas: Cita[];
 }

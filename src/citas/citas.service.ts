@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Cita } from './citas.entity';
+import { Cita } from './entities/citas.entity';
 import { Repository } from 'typeorm';
 import { CreateCitaDto } from './dto/create-cita.dto';
 import { UpdateCitaDto } from './dto/update-cita.dto';
-import { Psicologo } from '../psicologos/psicologos.entity';
+import { Psicologo } from '../psicologos/entities/psicologos.entity';
 
 @Injectable()
 export class CitasService {
