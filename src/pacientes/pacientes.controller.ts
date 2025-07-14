@@ -1,31 +1,81 @@
-import { Controller, Post, Body, Get, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
+
 import { PacientesService } from './pacientes.service';
 import { CreatePacienteDto } from './dto/create-paciente.dto';
-import { Usuario } from '../usuarios/usuarios.entity'; // esta referencia puede venir del auth logic
+import { RegisterPacienteDto } from './dto/register-paciente.dto';
+
+import { Public } from '../common/decorators/public.decorator';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '../auth/entities/account.entity';
+
+import { Paciente } from './entities/paciente.entity';
 
 @Controller('pacientes')
 export class PacientesController {
   constructor(private readonly service: PacientesService) {}
 
-  @Post()
-  async create(@Body() dto: CreatePacienteDto): Promise<any> {
-    const usuario = new Usuario(); // deberías recibirlo desde AuthService
-    // asignar email, password, rol, etc.
-    return this.service.create(dto, usuario);
+  /**
+   * Registro público de paciente
+   */
+  @Public()
+  @Post('register')
+  async register(
+    @Body() dto: RegisterPacienteDto
+  ): Promise<Paciente> {
+    return this.service.register(dto);
   }
 
+  /**
+   * Creación de paciente por ADMIN
+   */
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async create(
+    @Body() dto: CreatePacienteDto
+  ): Promise<Paciente> {
+    return this.service.create(dto);
+  }
+
+  /**
+   * Obtener lista de todos los pacientes
+   */
   @Get()
-  async all() {
+  @UseGuards(JwtAuthGuard)
+  async findAll(): Promise<Paciente[]> {
     return this.service.findAll();
   }
 
+  /**
+   * Obtener un paciente por su ID
+   */
   @Get(':id')
-  async one(@Param('id') id: number) {
-    return this.service.findById(id);
+  @UseGuards(JwtAuthGuard)
+  async findOne(
+    @Param('id') id: number
+  ): Promise<Paciente> {
+    return this.service.findById(+id);
   }
 
+  /**
+   * Eliminar un paciente por ADMIN
+   */
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    return this.service.delete(id);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async remove(
+    @Param('id') id: number
+  ): Promise<void> {
+    return this.service.remove(+id);
   }
 }

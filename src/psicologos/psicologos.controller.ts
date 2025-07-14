@@ -1,4 +1,5 @@
 // src/psicologos/psicologos.controller.ts
+
 import {
   Controller,
   Post,
@@ -14,19 +15,22 @@ import { PsicologosService } from './psicologos.service';
 import { CreatePsicologoDto } from './dto/create-psicologo.dto';
 import { RegisterPsicologoDto } from './dto/register-psicologo.dto';
 
+import { Public } from '../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { Public } from '../common/decorators/public.decorator';
 
 import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
-import { Account } from '../auth/entities/account.entity';
-import { Psicologo } from './entities/psicologos.entity';  // <–– nombre correcto del fichero
+import { Account, Role } from '../auth/entities/account.entity';
+import { Psicologo } from './entities/psicologos.entity';
 
 @Controller('psicologos')
 export class PsicologosController {
   constructor(private readonly service: PsicologosService) {}
 
+  /**
+   * Registro público de psicólogo
+   */
   @Public()
   @Post('register')
   async register(
@@ -41,41 +45,56 @@ export class PsicologosController {
     return psicologo;
   }
 
+  /**
+   * Creación de psicólogo por ADMIN
+   */
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(Role.ADMIN)
   async create(
     @Body() dto: CreatePsicologoDto,
-    @Req() req: RequestWithUser,           // 👈 aquí ya req.user es Account
+    @Req() req: RequestWithUser,
   ): Promise<Psicologo> {
-    const adminAccount: Account = req.user; // 👈 ya no hace falta cast
+    const adminAccount: Account = req.user;
     console.log('🧑‍⚕️ Admin creando psicólogo:', adminAccount.id);
     const psicologo = await this.service.create(dto, adminAccount);
     console.log('✅ Perfil de psicólogo creado por admin:', psicologo.id);
     return psicologo;
   }
 
+  /**
+   * Obtener todos los psicólogos
+   */
   @Get()
   @UseGuards(JwtAuthGuard)
   async findAll(): Promise<Psicologo[]> {
     return this.service.findAll();
   }
 
+  /**
+   * Obtener un psicólogo por ID
+   */
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: number): Promise<Psicologo> {
     return this.service.findById(+id);
   }
 
+  /**
+   * Obtener perfil completo de un psicólogo
+   */
   @Get('perfil/:id')
   @UseGuards(JwtAuthGuard)
   async getPerfil(@Param('id') id: number): Promise<any> {
     return this.service.getPerfilCompleto(+id);
   }
 
+  /**
+   * Eliminar un psicólogo por ADMIN
+   */
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(Role.ADMIN)
   async remove(@Param('id') id: number): Promise<void> {
     return this.service.delete(+id);
   }

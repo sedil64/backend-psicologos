@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Psicologo } from '../../psicologos/entities/psicologos.entity';
+import { Paciente }   from '../../pacientes/entities/paciente.entity';
 
 export type EstadoCita = 'pendiente' | 'confirmada' | 'cancelada';
 
@@ -35,4 +36,8 @@ export class Cita {
   @ManyToOne(() => Psicologo, psicologo => psicologo.citas, { eager: true })
   @JoinColumn()
   psicologo: Psicologo;
+
+  @ManyToOne(() => Paciente, pac => pac.citas, { eager: true })
+  @JoinColumn()
+  paciente: Paciente;
 }

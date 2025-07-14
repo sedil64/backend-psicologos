@@ -5,7 +5,14 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-export type Role = 'admin' | 'psicologo' | 'paciente';
+// antes tenías:
+// export type Role = 'admin' | 'psicologo' | 'paciente';
+
+export enum Role {
+  ADMIN     = 'admin',
+  PSICOLOGO = 'psicologo',
+  PACIENTE  = 'paciente',
+}
 
 @Entity('accounts')
 export class Account {
@@ -19,8 +26,8 @@ export class Account {
 
   @Column({
     type: 'enum',
-    enum: ['admin', 'psicologo', 'paciente'],
-    default: 'paciente',
+    enum: Role,
+    default: Role.PACIENTE,
   })
   role: Role;
 

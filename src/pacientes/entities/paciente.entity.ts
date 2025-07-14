@@ -1,21 +1,25 @@
+// src/pacientes/entities/paciente.entity.ts
+
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { Usuario } from '../../usuarios/usuarios.entity';
+import { Account } from '../../auth/entities/account.entity';
 import { Genero } from '../../common/enums/genero.enum';
+import { Cita } from '../../citas/entities/citas.entity';
 
 @Entity('pacientes')
 export class Paciente {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Usuario, { cascade: true })
+  @OneToOne(() => Account, { cascade: true, eager: true })
   @JoinColumn()
-  usuario: Usuario;
+  account: Account;
 
   @Column()
   nombres: string;
@@ -24,34 +28,32 @@ export class Paciente {
   apellidos: string;
 
   @Column({ unique: true })
-  identificacion: string; // cédula, DNI, pasaporte
+  identificacion: string;
 
   @Column({ type: 'date' })
   fechaNacimiento: Date;
 
-  @Column({
-    type: 'enum',
-    enum: Genero,
-    nullable: true,
-  })
-  genero: Genero;
+  @Column({ type: 'enum', enum: Genero, nullable: true })
+  genero?: Genero;
 
   @Column()
   telefono: string;
 
   @Column({ nullable: true })
-  telefonoEmergencia: string;
+  telefonoEmergencia?: string;
 
   @Column()
   correoElectronico: string;
 
   @Column({ nullable: true })
-  direccion: string;
+  direccion?: string;
 
   @Column()
   edad: number;
 
   @Column({ nullable: true })
-  antecedentesClinicos: string;
+  antecedentesClinicos?: string;
 
+  @OneToMany(() => Cita, cita => cita.paciente)
+  citas: Cita[];
 }
