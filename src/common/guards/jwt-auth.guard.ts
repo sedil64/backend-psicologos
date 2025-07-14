@@ -10,16 +10,21 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
-    // Permitir acceso si la ruta o controlador tiene el decorador @Public()
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isPublic) {
-      return true;
-    }
+    // Si la ruta es @Public(), la saltamos
+    const isPublic = this.reflector.getAllAndOverride<boolean>(
+      IS_PUBLIC_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (isPublic) return true;
 
-    // De lo contrario, usa la lógica estándar de AuthGuard('jwt')
     return super.canActivate(context);
+  }
+
+  handleRequest(err, user, info, context: ExecutionContext) {
+    // Esto te ayudará a ver qué llega al guard
+    console.log('--- JwtAuthGuard ● err:', err);
+    console.log('--- JwtAuthGuard ● user:', user);
+    console.log('--- JwtAuthGuard ● info:', info);
+    return super.handleRequest(err, user, info, context);
   }
 }
