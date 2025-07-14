@@ -23,7 +23,7 @@ export class AuthService {
     const account = this.accountRepo.create({
       email: dto.email,
       password: hash,
-      role: dto.role,      // ahora recibes el role en el DTO
+      role: dto.role,      
     });
     return this.accountRepo.save(account);
   }
