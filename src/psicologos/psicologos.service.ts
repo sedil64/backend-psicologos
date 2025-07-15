@@ -1,3 +1,4 @@
+// src/psicologos/psicologos.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,6 +10,8 @@ import { RegisterPsicologoDto } from './dto/register-psicologo.dto';
 import { Account } from '../auth/entities/account.entity';
 import { AuthService } from '../auth/auth.service';
 import { CertificacionesService } from '../certificaciones/certificaciones.service';
+import { Cita } from '../citas/entities/citas.entity';
+import { Paciente } from '../pacientes/entities/paciente.entity';
 
 @Injectable()
 export class PsicologosService {
@@ -19,6 +22,9 @@ export class PsicologosService {
     @InjectRepository(Account)
     private readonly accountRepo: Repository<Account>,
 
+    @InjectRepository(Cita)
+    private readonly citaRepo: Repository<Cita>,
+
     private readonly authService: AuthService,
     private readonly certService: CertificacionesService,
   ) {}
@@ -28,11 +34,7 @@ export class PsicologosService {
    */
   async register(dto: RegisterPsicologoDto): Promise<Psicologo> {
     const { email, password, role, ...profile } = dto;
-
-    // 1️⃣ primero crear la cuenta (tabla accounts)
     const account = await this.authService.register({ email, password, role });
-
-    // 2️⃣ luego crear perfil de psicólogo vinculado
     const psicologo = this.psicRepo.create({ account, ...profile });
     return this.psicRepo.save(psicologo);
   }
@@ -63,7 +65,6 @@ export class PsicologosService {
   async getPerfilCompleto(id: number): Promise<any> {
     const psicologo = await this.findById(id);
     const mongoDoc = await this.certService.obtenerPorPsicologo(id);
-
     return {
       psicologo,
       certificaciones: mongoDoc?.certificaciones ?? [],
@@ -72,5 +73,29 @@ export class PsicologosService {
 
   async delete(id: number): Promise<void> {
     await this.psicRepo.delete(id);
+  }
+
+  /**
+   * Lista las citas asignadas al psicólogo autenticado
+   */
+  async findMyCitas(psicologoId: number): Promise<Cita[]> {
+    return this.citaRepo.find({
+      where: { psicologo: { id: psicologoId } },
+      relations: ['paciente'],
+      order: { fecha: 'DESC', hora: 'ASC' },
+    });
+  }
+
+  /**
+   * Lista los pacientes únicos que han agendado citas con este psicólogo
+   */
+  async findMyPacientes(psicologoId: number): Promise<Paciente[]> {
+    const citas = await this.citaRepo.find({
+      where: { psicologo: { id: psicologoId } },
+      relations: ['paciente'],
+    });
+    const map = new Map<number, Paciente>();
+    citas.forEach(c => map.set(c.paciente.id, c.paciente));
+    return Array.from(map.values());
   }
 }
