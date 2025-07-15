@@ -34,7 +34,9 @@ export class PsicologosController {
    */
   @Public()
   @Post('register')
-  async register(@Body() dto: RegisterPsicologoDto): Promise<Psicologo> {
+  async register(
+    @Body() dto: RegisterPsicologoDto,
+  ): Promise<Psicologo> {
     console.log('📨 DTO recibido en /psicologos/register:', dto);
     const psicologo = await this.service.register(dto);
     console.log('✅ Psicólogo registrado:', {
@@ -42,6 +44,24 @@ export class PsicologosController {
       email: psicologo.account.email,
     });
     return psicologo;
+  }
+
+  /**
+   * Listar mis citas (psicólogo autenticado)
+   */
+  @Get('me/citas')
+  @UseGuards(JwtAuthGuard)
+  async getMyCitas(@Req() req: RequestWithUser): Promise<Cita[]> {
+    return this.service.findMyCitas(req.user.id);
+  }
+
+  /**
+   * Listar mis pacientes (psicólogo autenticado)
+   */
+  @Get('me/pacientes')
+  @UseGuards(JwtAuthGuard)
+  async getMyPacientes(@Req() req: RequestWithUser): Promise<Paciente[]> {
+    return this.service.findMyPacientes(req.user.id);
   }
 
   /**
@@ -96,23 +116,5 @@ export class PsicologosController {
   @Roles(Role.ADMIN)
   async remove(@Param('id') id: number): Promise<void> {
     return this.service.delete(+id);
-  }
-
-  /**
-   * Listar mis citas (psicólogo autenticado)
-   */
-  @Get('me/citas')
-  @UseGuards(JwtAuthGuard)
-  async getMyCitas(@Req() req: RequestWithUser): Promise<Cita[]> {
-    return this.service.findMyCitas(req.user.id);
-  }
-
-  /**
-   * Listar mis pacientes (psicólogo autenticado)
-   */
-  @Get('me/pacientes')
-  @UseGuards(JwtAuthGuard)
-  async getMyPacientes(@Req() req: RequestWithUser): Promise<Paciente[]> {
-    return this.service.findMyPacientes(req.user.id);
   }
 }
