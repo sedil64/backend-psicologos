@@ -23,5 +23,6 @@ import { CertificacionesModule }  from '../certificaciones/certificaciones.modul
   ],
   controllers: [PsicologosController],
   providers:   [PsicologosService],
+  exports: [PsicologosService],
 })
 export class PsicologosModule {}
