@@ -21,8 +21,10 @@ import { Account } from './entities/account.entity';
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
   exports: [
-    AuthService,   // ← IMPORTANTE: exportar AuthService
-    JwtStrategy,   // ← opcional si otros módulos lo necesitan
+    AuthService,
+    JwtStrategy,
+    TypeOrmModule, // 👈 AÑADE ESTA LÍNEA para exportar el repositorio Account
   ],
 })
 export class AuthModule {}
+
