@@ -1,5 +1,5 @@
 // src/psicologos/psicologos.module.ts
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { PsicologosController } from './psicologos.controller';
@@ -12,6 +12,7 @@ import { Paciente }     from '../pacientes/entities/paciente.entity';
 
 import { AuthModule }             from '../auth/auth.module';
 import { CertificacionesModule }  from '../certificaciones/certificaciones.module';
+import { CitasModule }     from '../citas/citas.module'; 
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CertificacionesModule }  from '../certificaciones/certificaciones.modul
     // IMPORTAR los módulos que proveen AuthService y CertificacionesService
     AuthModule,
     CertificacionesModule,
+    forwardRef(() => CitasModule), 
   ],
   controllers: [PsicologosController],
   providers:   [PsicologosService],

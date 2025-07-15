@@ -1,20 +1,19 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
-import { Cita } from './entities/citas.entity';
-import { CitasService } from './citas.service';
-import { CitasController } from './citas.controller';
-
-import { PsicologosModule } from '../psicologos/psicologos.module';
-import { PacientesModule }  from '../pacientes/pacientes.module';
+import { Module, forwardRef } from '@nestjs/common';
+import { TypeOrmModule }      from '@nestjs/typeorm';
+import { CitasController }    from './citas.controller';
+import { CitasService }       from './citas.service';
+import { Cita }               from './entities/citas.entity';
+import { PsicologosModule }   from '../psicologos/psicologos.module';
+import { PacientesModule }    from '../pacientes/pacientes.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Cita]),
-    PsicologosModule,
-    PacientesModule,
+    forwardRef(() => PsicologosModule),  // ← para inyectar PsicologosService
+    forwardRef(() => PacientesModule),   // ← para inyectar PacientesService
   ],
-  providers: [CitasService],
   controllers: [CitasController],
+  providers:   [CitasService],
+  exports:    [CitasService],           // ← exporta si otro módulo lo necesita
 })
 export class CitasModule {}
