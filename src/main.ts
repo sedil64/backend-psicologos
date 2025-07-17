@@ -24,8 +24,9 @@ async function bootstrap() {
   // CORS: SOLO el dominio de tu FRONTEND, no el backend
   app.enableCors({
     origin: [
-      'http://localhost:5173',                 // desarrollo
-      'https://desarrollo-software.xyz',       // tu front en prod
+      'http://localhost:5173',                 
+      'https://desarrollo-software.xyz',
+      'https://front-end-psicologos.vercel.app'
     ],
     methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
     allowedHeaders: ['Content-Type','Authorization'],
