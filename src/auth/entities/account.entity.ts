@@ -6,7 +6,6 @@ import {
 } from 'typeorm';
 
 // antes tenías:
-// export type Role = 'admin' | 'psicologo' | 'paciente';
 
 export enum Role {
   ADMIN     = 'admin',
