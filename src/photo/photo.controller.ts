@@ -11,10 +11,11 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import * as fs from 'fs';
+
 import { PhotoService } from './photo.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
-import * as fs from 'fs';
 
 @Controller('photos')
 export class PhotoController {
@@ -40,7 +41,7 @@ export class PhotoController {
     }),
   )
   async uploadFotoMe(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File, // ✅ corrección aquí
     @Req() req: RequestWithUser,
   ) {
     return this.service.uploadFotoFromAuth(file.filename, req.user.id);
