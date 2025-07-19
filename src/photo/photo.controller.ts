@@ -1,44 +1,55 @@
+// src/photo/photo.controller.ts
 import {
   Controller,
   Post,
-  Param,
-  UploadedFile,
+  Get,
+  UseGuards,
   UseInterceptors,
+  UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { PhotoService } from './photo.service';
-import { Express } from 'express';
-import { existsSync, mkdirSync } from 'fs';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
+import * as fs from 'fs';
 
 @Controller('photos')
 export class PhotoController {
-  constructor(private readonly photoService: PhotoService) {}
+  constructor(private readonly service: PhotoService) {}
 
-  @Post('upload/:psicologoId')
+  @UseGuards(JwtAuthGuard)
+  @Post('psicologo/me')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: (req, file, callback) => {
+        destination: (req, file, cb) => {
           const uploadPath = './uploads/fotos-psicologos';
-          if (!existsSync(uploadPath)) {
-            mkdirSync(uploadPath, { recursive: true });
+          if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
           }
-          callback(null, uploadPath);
+          cb(null, uploadPath);
         },
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `foto-${uniqueSuffix}${ext}`);
+        filename: (req, file, cb) => {
+          const uniqueName = `foto-${Date.now()}${extname(file.originalname)}`;
+          cb(null, uniqueName);
         },
       }),
     }),
   )
-  async uploadFoto(
-    @Param('psicologoId') psicologoId: number,
-    @UploadedFile() file,
+  async uploadFotoMe(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithUser,
   ) {
-    return this.photoService.saveFoto(file.filename, psicologoId);
+    return this.service.uploadFotoFromAuth(file.filename, req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('psicologo/me')
+  async getFotoMe(@Req() req: RequestWithUser) {
+    const url = await this.service.getFotoFromAuth(req.user.id);
+    return { url };
   }
 }

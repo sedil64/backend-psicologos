@@ -10,6 +10,7 @@ import { Account } from '../../auth/entities/account.entity';
 import { Genero } from '../../common/enums/genero.enum';
 import { Cita } from '../../citas/entities/citas.entity';
 import { FotoPsicologo } from '../../photo/entity/foto-psicologo.entity';
+import { Disponibilidad } from '../../disponibilidad/entity/disponibilidad.entity';
 
 @Entity('psicologos')
 export class Psicologo {
@@ -74,5 +75,11 @@ export class Psicologo {
 
   @OneToMany(() => Cita, cita => cita.psicologo, { cascade: true })
   citas: Cita[];
+
+  @OneToMany(
+    () => Disponibilidad,
+    disponibilidad => disponibilidad.psicologo,
+  )
+  disponibilidades: Disponibilidad[];
 
 }

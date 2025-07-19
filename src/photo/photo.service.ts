@@ -1,8 +1,9 @@
+// src/photo/photo.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { FotoPsicologo } from './entity/foto-psicologo.entity';
 import { Psicologo } from '../psicologos/entities/psicologos.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PhotoService {
@@ -13,9 +14,9 @@ export class PhotoService {
     private readonly psicologoRepo: Repository<Psicologo>,
   ) {}
 
-  async saveFoto(filename: string, psicologoId: number) {
+  async uploadFotoFromAuth(filename: string, accountId: number) {
     const psicologo = await this.psicologoRepo.findOne({
-      where: { id: psicologoId },
+      where: { account: { id: accountId } },
     });
 
     if (!psicologo) {
@@ -23,10 +24,18 @@ export class PhotoService {
     }
 
     const foto = this.fotoRepo.create({
-      url: `uploads/fotos-psicologos/${filename}`,
+      url: `/uploads/fotos-psicologos/${filename}`,
       psicologo,
     });
 
     return this.fotoRepo.save(foto);
+  }
+
+  async getFotoFromAuth(accountId: number): Promise<string | null> {
+    const foto = await this.fotoRepo.findOne({
+      where: { psicologo: { account: { id: accountId } } },
+    });
+
+    return foto?.url ?? null;
   }
 }
