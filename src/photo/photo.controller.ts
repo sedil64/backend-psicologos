@@ -41,7 +41,7 @@ export class PhotoController {
     }),
   )
   async uploadFotoMe(
-    @UploadedFile() file: Express.Multer.File, // ✅ corrección aquí
+    @UploadedFile() file, // ✅ sin tipo explícito
     @Req() req: RequestWithUser,
   ) {
     return this.service.uploadFotoFromAuth(file.filename, req.user.id);
