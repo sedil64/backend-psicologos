@@ -1,24 +1,29 @@
 // src/citas/citas.module.ts
 import { Module, forwardRef } from '@nestjs/common';
-import { TypeOrmModule }      from '@nestjs/typeorm';
+import { TypeOrmModule }         from '@nestjs/typeorm';
 
-import { Cita }               from './entities/citas.entity';
-import { Disponibilidad }     from '../disponibilidad/entity/disponibilidad.entity';
-import { CitasService }       from './citas.service';
-import { CitasController }    from './citas.controller';
+import { Cita }                  from './entities/citas.entity';
+import { Disponibilidad }        from '../disponibilidad/entity/disponibilidad.entity';
 
-import { PsicologosModule }   from '../psicologos/psicologos.module';
-import { PacientesModule }    from '../pacientes/pacientes.module';
+import { CitasController }       from './citas.controller';
+import { CitasService }          from './citas.service';
+import { PsicologosModule }      from '../psicologos/psicologos.module';
+import { PacientesModule }       from '../pacientes/pacientes.module';
+// ✅ Importa el módulo de disponibilidades:
+import { DisponibilidadModule }  from '../disponibilidad/disponibilidad.module';
 
 @Module({
   imports: [
-    // Registramos aquí los repositorios de ambas entidades
+    // Registramos ambos repositorios aquí
     TypeOrmModule.forFeature([Cita, Disponibilidad]),
 
-    // Si PsicologosModule y PacientesModule te inyectan recíprocamente,
-    // rompe el ciclo con forwardRef:
+    // para PsicologosService y PacientesService
     forwardRef(() => PsicologosModule),
     forwardRef(() => PacientesModule),
+
+    // **quita** el TypeOrmModule.forFeature([Disponibilidad]) *si* importas el módulo,
+    // o bien déjalo y elimina este import y usa sólo el módulo:
+    DisponibilidadModule,
   ],
   controllers: [CitasController],
   providers:   [CitasService],
