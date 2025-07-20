@@ -158,4 +158,28 @@ export class PsicologosService {
       order: { fecha: 'ASC', horaInicio: 'ASC' },
     });
   }
+
+  // Nuevo método: verificar si psicólogo tiene disponibilidad libre y futura
+  async tieneDisponibilidad(psicologoId: number): Promise<boolean> {
+    const count = await this.disponibilidadRepo.count({
+      where: {
+        psicologo: { id: psicologoId },
+        estado: EstadoDisponibilidad.Libre,
+        fecha: MoreThanOrEqual(new Date()),
+      },
+    });
+    return count > 0;
+  }
+
+  // Nuevo método: traer psicólogos que tienen al menos una disponibilidad activa
+  async findAllWithDisponibilidad(): Promise<Psicologo[]> {
+    return this.psicRepo
+      .createQueryBuilder('psicologo')
+      .innerJoin('psicologo.disponibilidades', 'disponibilidad', 'disponibilidad.estado = :estado AND disponibilidad.fecha >= :hoy', {
+        estado: EstadoDisponibilidad.Libre,
+        hoy: new Date(),
+      })
+      .leftJoinAndSelect('psicologo.account', 'account')
+      .getMany();
+  }
 }

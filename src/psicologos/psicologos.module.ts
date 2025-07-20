@@ -9,7 +9,9 @@ import { Psicologo } from './entities/psicologos.entity';
 import { Account } from '../auth/entities/account.entity';
 import { Cita } from '../citas/entities/citas.entity';
 import { Paciente } from '../pacientes/entities/paciente.entity';
-import { Disponibilidad } from '../disponibilidad/entity/disponibilidad.entity'; // ✅ FALTA ESTO
+import { Disponibilidad } from '../disponibilidad/entity/disponibilidad.entity'; 
+import { EstadoDisponibilidad } from '../disponibilidad/entity/disponibilidad.entity';
+import { MoreThanOrEqual } from 'typeorm';
 
 import { AuthModule } from '../auth/auth.module';
 import { CertificacionesModule } from '../certificaciones/certificaciones.module';

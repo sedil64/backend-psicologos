@@ -1,3 +1,4 @@
+// src/disponibilidad/entity/disponibilidad.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,

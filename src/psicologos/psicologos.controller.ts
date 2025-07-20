@@ -98,4 +98,12 @@ export class PsicologosController {
   async remove(@Param('id') id: number): Promise<void> {
     return this.service.delete(+id);
   }
+
+  @Get(':id/tiene-disponibilidad')
+  @UseGuards(JwtAuthGuard)
+  async tieneDisponibilidad(@Param('id') id: number): Promise<{ disponible: boolean }> {
+    const disponible = await this.service.tieneDisponibilidad(id);
+    return { disponible };
+  }
+
 }
