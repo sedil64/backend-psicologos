@@ -17,7 +17,7 @@ export class Psicologo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Account, { cascade: true })
+  @OneToOne(() => Account, { cascade: true, eager: true })
   @JoinColumn()
   account: Account;
 

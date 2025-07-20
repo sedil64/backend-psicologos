@@ -36,32 +36,34 @@ export class PsicologosController {
   @Get('me/citas')
   @UseGuards(JwtAuthGuard)
   async getMyCitas(@Req() req: RequestWithUser): Promise<Cita[]> {
-    return this.service.findMyCitas(req.user.id);
+    const psicologo = await this.service.getPsicologoByAccountId(req.user.id); // 🔁 CAMBIO CLAVE
+    return this.service.findMyCitas(psicologo.id);
   }
 
   @Get('me/pacientes')
   @UseGuards(JwtAuthGuard)
   async getMyPacientes(@Req() req: RequestWithUser): Promise<Paciente[]> {
-    return this.service.findMyPacientes(req.user.id);
+    const psicologo = await this.service.getPsicologoByAccountId(req.user.id); // 🔁 CAMBIO CLAVE
+    return this.service.findMyPacientes(psicologo.id);
   }
 
-  // Liberar un horario disponible
   @Post('me/disponibilidad')
   @UseGuards(JwtAuthGuard)
   async crearDisponibilidad(
     @Body() dto: CrearDisponibilidadDto,
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad> {
-    return this.service.crearDisponibilidad(req.user.id, dto);
+    const psicologo = await this.service.getPsicologoByAccountId(req.user.id); // 🔁 CAMBIO CLAVE
+    return this.service.crearDisponibilidad(psicologo.id, dto);
   }
 
-  // Listar disponibilidades libres FUTURAS
   @Get('me/disponibilidad')
   @UseGuards(JwtAuthGuard)
   async getDisponibilidadesActivas(
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad[]> {
-    return this.service.getDisponibilidadesActivas(req.user.id);
+    const psicologo = await this.service.getPsicologoByAccountId(req.user.id); // 🔁 CAMBIO CLAVE
+    return this.service.getDisponibilidadesActivas(psicologo.id);
   }
 
   @Post()
@@ -74,8 +76,8 @@ export class PsicologosController {
     return this.service.create(dto, req.user);
   }
 
+  @Public()
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll(): Promise<Psicologo[]> {
     return this.service.findAll();
   }
@@ -101,9 +103,10 @@ export class PsicologosController {
 
   @Get(':id/tiene-disponibilidad')
   @UseGuards(JwtAuthGuard)
-  async tieneDisponibilidad(@Param('id') id: number): Promise<{ disponible: boolean }> {
-    const disponible = await this.service.tieneDisponibilidad(id);
+  async tieneDisponibilidad(
+    @Param('id') id: number,
+  ): Promise<{ disponible: boolean }> {
+    const disponible = await this.service.tieneDisponibilidad(+id);
     return { disponible };
   }
-
 }
