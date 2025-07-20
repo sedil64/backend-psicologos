@@ -1,21 +1,27 @@
+// src/citas/citas.module.ts
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule }      from '@nestjs/typeorm';
-import { CitasController }    from './citas.controller';
-import { CitasService }       from './citas.service';
+
 import { Cita }               from './entities/citas.entity';
+import { Disponibilidad }     from '../disponibilidad/entity/disponibilidad.entity';
+import { CitasService }       from './citas.service';
+import { CitasController }    from './citas.controller';
+
 import { PsicologosModule }   from '../psicologos/psicologos.module';
 import { PacientesModule }    from '../pacientes/pacientes.module';
-import { DisponibilidadModule } from '../disponibilidad/disponibilidad.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Cita]),
-    DisponibilidadModule,
-    forwardRef(() => PsicologosModule),  // ← para inyectar PsicologosService
-    forwardRef(() => PacientesModule),   // ← para inyectar PacientesService
+    // ← Aquí debes incluir **las dos** entidades
+    TypeOrmModule.forFeature([Cita, Disponibilidad]),
+
+    // Si PsicologosModule y PacientesModule se importan mutuamente,
+    // usa forwardRef para romper el ciclo:
+    forwardRef(() => PsicologosModule),
+    forwardRef(() => PacientesModule),
   ],
   controllers: [CitasController],
   providers:   [CitasService],
-  exports:    [CitasService],           // ← exporta si otro módulo lo necesita
+  exports:     [CitasService],
 })
 export class CitasModule {}
