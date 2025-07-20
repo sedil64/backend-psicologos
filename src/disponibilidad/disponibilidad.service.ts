@@ -12,6 +12,9 @@ export class DisponibilidadService {
   constructor(
     @InjectRepository(Disponibilidad)
     private readonly repo: Repository<Disponibilidad>,
+
+    @InjectRepository(Psicologo)
+    private readonly psicRepo: Repository<Psicologo>,
   ) {}
 
   /**
@@ -30,30 +33,58 @@ export class DisponibilidadService {
 
   /**
    * Crea una nueva disponibilidad para un psicólogo autenticado.
+   * Aquí recibimos accountId, buscamos el psicólogo asociado y creamos la disponibilidad.
    */
   async crearDisponibilidad(
-    psicologoId: number,
+    accountId: number,
     dto: CrearDisponibilidadDto,
   ): Promise<Disponibilidad> {
-    const disponibilidad = this.repo.create({
-      fecha: dto.fecha,
+    // Buscar perfil de psicólogo que tenga esta accountId
+    const psicologo = await this.psicRepo.findOne({
+      where: { account: { id: accountId } },
+    });
+    if (!psicologo) {
+      throw new NotFoundException(
+        `No existe perfil de psicólogo para cuenta ${accountId}`,
+      );
+    }
+
+    // Validar que la fecha no sea pasada
+    const fechaObj = new Date(dto.fecha);
+    if (fechaObj < new Date()) {
+      throw new NotFoundException('Fecha no puede ser anterior a hoy');
+    }
+
+    // Crear disponibilidad
+    const nueva = this.repo.create({
+      psicologo,
+      fecha: fechaObj,
       horaInicio: dto.horaInicio,
       horaFin: dto.horaFin,
       estado: EstadoDisponibilidad.Libre,
-      psicologo: { id: psicologoId } as Psicologo,
     });
 
-    return this.repo.save(disponibilidad);
+    return this.repo.save(nueva);
   }
 
   /**
    * Devuelve todas las disponibilidades creadas por el psicólogo.
    */
-  async getDisponibilidadesPorPsicologo(psicologoId: number): Promise<Disponibilidad[]> {
+  async getDisponibilidadesPorPsicologo(
+    accountId: number,
+  ): Promise<Disponibilidad[]> {
+    // Mapeamos accountId a psicologo.id
+    const psicologo = await this.psicRepo.findOne({
+      where: { account: { id: accountId } },
+    });
+    if (!psicologo) {
+      throw new NotFoundException(
+        `No existe perfil de psicólogo para cuenta ${accountId}`,
+      );
+    }
+
     return this.repo.find({
-      where: {
-        psicologo: { id: psicologoId },
-      },
+      where: { psicologo: { id: psicologo.id } },
       order: { fecha: 'DESC', horaInicio: 'ASC' },
     });
   }
