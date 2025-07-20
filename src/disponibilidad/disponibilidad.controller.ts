@@ -36,7 +36,7 @@ export class DisponibilidadController {
     @Request() req,
     @Body() dto: CrearDisponibilidadDto,
   ): Promise<Disponibilidad> {
-    const psicologoId = req.user.user.id;
+    const psicologoId = req.user.id;;
     return this.disponibilidadService.crearDisponibilidad(psicologoId, dto);
   }
 
@@ -47,7 +47,7 @@ export class DisponibilidadController {
   async listarDisponibilidadesPropias(
     @Request() req,
   ): Promise<Disponibilidad[]> {
-    const psicologoId = req.user.user.id;
+    const psicologoId = req.user.id;;
     return this.disponibilidadService.getDisponibilidadesPorPsicologo(psicologoId);
   }
 }
