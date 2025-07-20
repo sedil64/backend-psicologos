@@ -5,10 +5,11 @@ import { CitasService }       from './citas.service';
 import { Cita }               from './entities/citas.entity';
 import { PsicologosModule }   from '../psicologos/psicologos.module';
 import { PacientesModule }    from '../pacientes/pacientes.module';
+import { Disponibilidad } from '../disponibilidad/entity/disponibilidad.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Cita]),
+    TypeOrmModule.forFeature([Cita, Disponibilidad]),
     forwardRef(() => PsicologosModule),  // ← para inyectar PsicologosService
     forwardRef(() => PacientesModule),   // ← para inyectar PacientesService
   ],
