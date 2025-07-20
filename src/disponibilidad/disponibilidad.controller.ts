@@ -36,7 +36,7 @@ export class DisponibilidadController {
     @Request() req,
     @Body() dto: CrearDisponibilidadDto,
   ): Promise<Disponibilidad> {
-    const psicologoId = req.user.userId;
+    const psicologoId = req.user.user.id;
     return this.disponibilidadService.crearDisponibilidad(psicologoId, dto);
   }
 
