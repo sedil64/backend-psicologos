@@ -47,7 +47,7 @@ export class DisponibilidadController {
   async listarDisponibilidadesPropias(
     @Request() req,
   ): Promise<Disponibilidad[]> {
-    const psicologoId = req.user.userId;
+    const psicologoId = req.user.user.id;
     return this.disponibilidadService.getDisponibilidadesPorPsicologo(psicologoId);
   }
 }
