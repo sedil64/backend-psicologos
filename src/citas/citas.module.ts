@@ -12,11 +12,11 @@ import { PacientesModule }    from '../pacientes/pacientes.module';
 
 @Module({
   imports: [
-    // ← Aquí debes incluir **las dos** entidades
+    // Registramos aquí los repositorios de ambas entidades
     TypeOrmModule.forFeature([Cita, Disponibilidad]),
 
-    // Si PsicologosModule y PacientesModule se importan mutuamente,
-    // usa forwardRef para romper el ciclo:
+    // Si PsicologosModule y PacientesModule te inyectan recíprocamente,
+    // rompe el ciclo con forwardRef:
     forwardRef(() => PsicologosModule),
     forwardRef(() => PacientesModule),
   ],
