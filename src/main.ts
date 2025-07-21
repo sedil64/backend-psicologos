@@ -44,7 +44,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true, 
     }),
   );
-
+ 
   const port = process.env.PORT || 3006;
   await app.listen(port, '0.0.0.0');
   console.log(`Servidor escuchando ${port}`);

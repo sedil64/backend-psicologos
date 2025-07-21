@@ -44,10 +44,10 @@ export class PsicologosService {
     private readonly certService: CertificacionesService,
   ) {}
 
-  // 🔐 Método para obtener el psicólogo por el ID de cuenta del usuario logueado
   async getPsicologoByAccountId(accountId: number): Promise<Psicologo> {
     const psicologo = await this.psicRepo.findOne({
       where: { account: { id: accountId } },
+      relations: ['account'], // 🔍 asegura relación cargada
     });
 
     if (!psicologo) {
@@ -57,7 +57,7 @@ export class PsicologosService {
     return psicologo;
   }
 
-  // Registro público
+  // ✅ Registro completo con vinculación entre Account y Psicologo
   async register(dto: RegisterPsicologoDto): Promise<Psicologo> {
     const { email, password, ...profile } = dto;
 
@@ -69,13 +69,12 @@ export class PsicologosService {
 
     const psicologo = this.psicRepo.create({
       ...profile,
-      account, // ✅ asociación correcta con la cuenta
+      account,
     });
 
     return this.psicRepo.save(psicologo);
   }
 
-  // Creación por ADMIN
   async create(dto: CreatePsicologoDto, account: Account): Promise<Psicologo> {
     const psicologo = this.psicRepo.create({ ...dto, account });
     return this.psicRepo.save(psicologo);
@@ -109,7 +108,6 @@ export class PsicologosService {
     await this.psicRepo.delete(id);
   }
 
-  // Mis citas
   async findMyCitas(psicologoAccountId: number): Promise<Cita[]> {
     const psicologo = await this.getPsicologoByAccountId(psicologoAccountId);
     return this.citaRepo.find({
@@ -119,7 +117,6 @@ export class PsicologosService {
     });
   }
 
-  // Mis pacientes
   async findMyPacientes(psicologoAccountId: number): Promise<Paciente[]> {
     const psicologo = await this.getPsicologoByAccountId(psicologoAccountId);
     const citas = await this.citaRepo.find({
@@ -131,7 +128,6 @@ export class PsicologosService {
     return Array.from(map.values());
   }
 
-  // Liberar nueva disponibilidad
   async crearDisponibilidad(
     accountId: number,
     dto: CrearDisponibilidadDto,
@@ -164,7 +160,6 @@ export class PsicologosService {
     return this.disponibilidadRepo.save(disponibilidad);
   }
 
-  // Listar disponibilidades libres y futuras
   async getDisponibilidadesActivas(
     accountId: number,
   ): Promise<Disponibilidad[]> {
@@ -179,7 +174,6 @@ export class PsicologosService {
     });
   }
 
-  // Verificar si psicólogo tiene disponibilidad libre y futura
   async tieneDisponibilidad(psicologoId: number): Promise<boolean> {
     const count = await this.disponibilidadRepo.count({
       where: {
@@ -191,7 +185,6 @@ export class PsicologosService {
     return count > 0;
   }
 
-  // Listar psicólogos con disponibilidad activa
   async findAllWithDisponibilidad(): Promise<Psicologo[]> {
     return this.psicRepo
       .createQueryBuilder('psicologo')

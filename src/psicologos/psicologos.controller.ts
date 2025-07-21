@@ -1,3 +1,4 @@
+// src/psicologos/psicologos.controller.ts
 import {
   Controller,
   Post,
@@ -18,7 +19,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
-import { Account, Role } from '../auth/entities/account.entity';
+import { Role } from '../auth/entities/account.entity';
 import { Psicologo } from './entities/psicologos.entity';
 import { Cita } from '../citas/entities/citas.entity';
 import { Paciente } from '../pacientes/entities/paciente.entity';
@@ -30,20 +31,20 @@ export class PsicologosController {
   @Public()
   @Post('register')
   async register(@Body() dto: RegisterPsicologoDto): Promise<Psicologo> {
-    return this.service.register(dto);
+    return this.service.register(dto); // ✅ vincula cuenta al psicólogo
   }
 
   @Get('me/citas')
   @UseGuards(JwtAuthGuard)
   async getMyCitas(@Req() req: RequestWithUser): Promise<Cita[]> {
-    const psicologo = await this.service.getPsicologoByAccountId(req.user.id); // 🔁 CAMBIO CLAVE
+    const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
     return this.service.findMyCitas(psicologo.id);
   }
 
   @Get('me/pacientes')
   @UseGuards(JwtAuthGuard)
   async getMyPacientes(@Req() req: RequestWithUser): Promise<Paciente[]> {
-    const psicologo = await this.service.getPsicologoByAccountId(req.user.id); // 🔁 CAMBIO CLAVE
+    const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
     return this.service.findMyPacientes(psicologo.id);
   }
 
@@ -53,7 +54,7 @@ export class PsicologosController {
     @Body() dto: CrearDisponibilidadDto,
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad> {
-    const psicologo = await this.service.getPsicologoByAccountId(req.user.id); // 🔁 CAMBIO CLAVE
+    const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
     return this.service.crearDisponibilidad(psicologo.id, dto);
   }
 
@@ -62,7 +63,7 @@ export class PsicologosController {
   async getDisponibilidadesActivas(
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad[]> {
-    const psicologo = await this.service.getPsicologoByAccountId(req.user.id); // 🔁 CAMBIO CLAVE
+    const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
     return this.service.getDisponibilidadesActivas(psicologo.id);
   }
 
