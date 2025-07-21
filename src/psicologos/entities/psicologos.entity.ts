@@ -47,13 +47,10 @@ export class Psicologo {
   telefonoEmergencia: string;
 
   @Column()
-  correoElectronico: string;
+  email: string;
 
   @Column({ nullable: true })
   direccion: string;
-
-  @Column()
-  licencia: string;
 
   @Column()
   especialidad: string;
