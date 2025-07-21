@@ -34,7 +34,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
         password: configService.get<string>('DB_PASS'),
         database: configService.get<string>('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: process.env.NODE_ENV !== 'production',
+        synchronize: true,
         ssl: { rejectUnauthorized: false },
         extra: { ssl: true },
       }),
@@ -58,7 +58,6 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
       useFactory: (reflector: Reflector) => new JwtAuthGuard(reflector),
       inject: [Reflector],
     },
-    // NO poner RolesGuard aquí como APP_GUARD
   ],
 })
 export class AppModule {}
