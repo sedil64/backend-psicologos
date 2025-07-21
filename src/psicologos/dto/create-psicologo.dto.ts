@@ -1,6 +1,15 @@
-import { IsString, IsDateString, IsEnum, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsNumber,
+  IsEmail,
+  MinLength,
+} from 'class-validator';
 import { Genero } from '../../common/enums/genero.enum';
-
+import { Role } from '../../auth/entities/account.entity';
+/*comentarios*/
 export class CreatePsicologoDto {
   @IsString()
   nombres: string;
@@ -46,4 +55,12 @@ export class CreatePsicologoDto {
   @IsOptional()
   @IsString()
   certificaciones?: string;
+}
+
+export class RegisterPsicologoDto extends CreatePsicologoDto {
+  @MinLength(6)
+  password: string;
+
+  @IsEnum(Role)
+  role: Role = Role.PSICOLOGO;
 }
