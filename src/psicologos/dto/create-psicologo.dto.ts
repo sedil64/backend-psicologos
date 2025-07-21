@@ -25,15 +25,12 @@ export class CreatePsicologoDto {
   @IsString()
   telefonoEmergencia?: string;
 
-  @IsString()
-  correoElectronico: string;
+  @IsEmail()
+  email: string;
 
   @IsOptional()
   @IsString()
   direccion?: string;
-
-  @IsString()
-  licencia: string;
 
   @IsString()
   especialidad: string;
