@@ -34,9 +34,6 @@ export class CreatePsicologoDto {
   @IsString()
   telefonoEmergencia?: string;
 
-  @IsEmail()
-  email: string;
-
   @IsOptional()
   @IsString()
   direccion?: string;
@@ -58,8 +55,6 @@ export class CreatePsicologoDto {
 }
 
 export class RegisterPsicologoDto extends CreatePsicologoDto {
-  @MinLength(6)
-  password: string;
 
   @IsEnum(Role)
   role: Role = Role.PSICOLOGO;

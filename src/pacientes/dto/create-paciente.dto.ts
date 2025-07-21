@@ -23,5 +23,5 @@ export class CreatePacienteDto {
 
   @IsOptional()
   @IsBoolean()
-  activo?: boolean;     // nuevo campo validado como booleano
+  activo?: boolean;   
 }
