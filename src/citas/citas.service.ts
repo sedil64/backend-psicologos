@@ -39,7 +39,7 @@ export class CitasService {
   }
 
   async findAll(): Promise<Cita[]> {
-    return this.citaRepo.find();  // eager carga psicologo y paciente
+    return this.citaRepo.find();
   }
 
   async findOne(id: number): Promise<Cita> {
@@ -64,19 +64,11 @@ export class CitasService {
     await this.citaRepo.delete(id);
   }
 
-  /**
-   * Nuevo método: agenda una cita a partir de una disponibilidad,
-   * sólo si está libre, y actualiza la disponibilidad a reservada.
-   * @param pacienteId id del paciente que agenda
-   * @param disponibilidadId id de la disponibilidad seleccionada
-   * @param nombreCliente nombre para la cita
-   */
   async agendarDesdeDisponibilidad(
     pacienteId: number,
     disponibilidadId: number,
     nombreCliente: string,
   ): Promise<Cita> {
-    // Buscar disponibilidad
     const disponibilidad = await this.disponibilidadRepo.findOne({
       where: { id: disponibilidadId },
       relations: ['psicologo'],
@@ -87,12 +79,10 @@ export class CitasService {
     if (disponibilidad.estado !== EstadoDisponibilidad.Libre)
       throw new BadRequestException(`Disponibilidad no está libre`);
 
-    // Buscar paciente
     const paciente = await this.pacientesService.findById(pacienteId);
     if (!paciente)
       throw new NotFoundException(`Paciente ${pacienteId} no encontrado`);
 
-    // Crear la cita con los datos de la disponibilidad y paciente
     const cita = this.citaRepo.create({
       nombreCliente,
       fecha: disponibilidad.fecha,
@@ -102,10 +92,8 @@ export class CitasService {
       estado: EstadoCita.Pendiente,
     });
 
-    // Guardar cita
     const citaGuardada = await this.citaRepo.save(cita);
 
-    // Actualizar disponibilidad a reservada
     disponibilidad.estado = EstadoDisponibilidad.Reservada;
     await this.disponibilidadRepo.save(disponibilidad);
 

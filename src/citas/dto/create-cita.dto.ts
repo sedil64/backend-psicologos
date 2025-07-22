@@ -1,18 +1,22 @@
-import { IsString, IsDateString, IsInt } from 'class-validator';
+import { IsString, IsDateString, IsInt, IsOptional } from 'class-validator';
 
 export class CreateCitaDto {
   @IsString()
   nombreCliente: string;
 
   @IsDateString()
-  fecha: string;       // formato ISO: YYYY-MM-DD
+  fecha: string;
 
   @IsString()
-  hora: string;        // formato HH:MM:SS
+  hora: string;
 
   @IsInt()
-  psicologoId: number; // ID del psicólogo
+  psicologoId: number;
 
   @IsInt()
-  pacienteId: number;  // ID del paciente
+  pacienteId: number;
+
+  @IsOptional()
+  @IsInt()
+  disponibilidadId?: number;
 }

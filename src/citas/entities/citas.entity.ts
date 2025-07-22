@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Psicologo } from '../../psicologos/entities/psicologos.entity';
 import { Paciente } from '../../pacientes/entities/paciente.entity';
+import { Disponibilidad } from '../../disponibilidad/entity/disponibilidad.entity';
 
 export enum EstadoCita {
   Pendiente   = 'pendiente',
@@ -50,6 +51,10 @@ export class Cita {
   })
   @JoinColumn({ name: 'paciente_id' })
   paciente: Paciente;
+
+  @ManyToOne(() => Disponibilidad, { eager: true, nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'disponibilidad_id' })
+  disponibilidad?: Disponibilidad;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
