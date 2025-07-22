@@ -52,7 +52,8 @@ export class PsicologosController {
     }
     this.logger.log(`Psicólogo encontrado: id=${psicologo.id}`);
 
-    const citas = await this.service.findMyCitas(psicologo.id);
+    // PASAR EL accountId, no psicologo.id
+    const citas = await this.service.findMyCitas(req.user.id);
     this.logger.log(`Número de citas encontradas: ${citas.length}`);
 
     return citas;
@@ -70,7 +71,8 @@ export class PsicologosController {
     }
     this.logger.log(`Psicólogo encontrado: id=${psicologo.id}`);
 
-    const pacientes = await this.service.findMyPacientes(psicologo.id);
+    // PASAR EL accountId, no psicologo.id
+    const pacientes = await this.service.findMyPacientes(req.user.id);
     this.logger.log(`Número de pacientes encontrados: ${pacientes.length}`);
 
     return pacientes;

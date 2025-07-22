@@ -45,16 +45,28 @@ export class PsicologosService {
     private readonly certService: CertificacionesService,
   ) {}
 
-  private validarAccountId(accountId: any): number {
+  /**
+   * Valida que el accountId recibido sea un número válido.
+   * @param accountId Valor a validar.
+   * @returns El accountId como número.
+   * @throws BadRequestException si no es un número válido.
+   */
+  private validarAccountId(accountId: unknown): number {
     const id = Number(accountId);
-    if (isNaN(id)) {
+    if (isNaN(id) || id <= 0) {
       this.logger.warn(`accountId inválido recibido: ${accountId}`);
       throw new BadRequestException('ID de cuenta inválido');
     }
     return id;
   }
 
-  async getPsicologoByAccountId(accountId: any): Promise<Psicologo> {
+  /**
+   * Obtiene el psicólogo relacionado con el accountId.
+   * @param accountId Id de la cuenta.
+   * @returns Psicólogo asociado.
+   * @throws NotFoundException si no existe psicólogo para esa cuenta.
+   */
+  async getPsicologoByAccountId(accountId: unknown): Promise<Psicologo> {
     const id = this.validarAccountId(accountId);
     this.logger.log(`Buscando psicólogo con accountId=${id}`);
 
@@ -172,7 +184,7 @@ export class PsicologosService {
     this.logger.log(`Psicólogo eliminado con id=${id}`);
   }
 
-  async findMyCitas(psicologoAccountId: any): Promise<Cita[]> {
+  async findMyCitas(psicologoAccountId: unknown): Promise<Cita[]> {
     const id = this.validarAccountId(psicologoAccountId);
     this.logger.log(`Obteniendo citas para accountId=${id}`);
     const psicologo = await this.getPsicologoByAccountId(id);
@@ -185,7 +197,7 @@ export class PsicologosService {
     return citas;
   }
 
-  async findMyPacientes(psicologoAccountId: any): Promise<Paciente[]> {
+  async findMyPacientes(psicologoAccountId: unknown): Promise<Paciente[]> {
     const id = this.validarAccountId(psicologoAccountId);
     this.logger.log(`Obteniendo pacientes para accountId=${id}`);
     const psicologo = await this.getPsicologoByAccountId(id);
@@ -200,7 +212,7 @@ export class PsicologosService {
   }
 
   async crearDisponibilidad(
-    accountId: any,
+    accountId: unknown,
     dto: CrearDisponibilidadDto,
   ): Promise<Disponibilidad> {
     const id = this.validarAccountId(accountId);
@@ -241,7 +253,7 @@ export class PsicologosService {
   }
 
   async getDisponibilidadesActivas(
-    accountId: any,
+    accountId: unknown,
   ): Promise<Disponibilidad[]> {
     const id = this.validarAccountId(accountId);
     this.logger.log(`Obteniendo disponibilidades activas para accountId=${id}`);
