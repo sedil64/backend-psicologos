@@ -1,4 +1,3 @@
-// create-paciente.dto.ts
 import {
   IsString,
   IsDateString,
@@ -36,9 +35,6 @@ export class CreatePacienteDto {
   @IsOptional()
   @IsString()
   direccion?: string;
-
-  @IsNumber()
-  edad: number;
 
   @IsOptional()
   @IsString()

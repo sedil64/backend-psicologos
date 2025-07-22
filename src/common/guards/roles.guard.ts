@@ -19,7 +19,7 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const userRole = user?.role;          // ← ya no 'rol'
+    const userRole = user?.role;          
 
     // Logs actualizados
     console.log('🛡️ Roles requeridos para la ruta:', requiredRoles);

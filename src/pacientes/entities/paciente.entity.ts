@@ -46,9 +46,6 @@ export class Paciente {
   @Column({ nullable: true })
   direccion?: string;
 
-  @Column('int')
-  edad: number;
-
   @Column({ type: 'text', nullable: true })
   antecedentesClinicos?: string;
 
