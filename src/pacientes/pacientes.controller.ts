@@ -6,8 +6,8 @@ import {
   Param,
   Body,
   UseGuards,
+  Req,
 } from '@nestjs/common';
-
 import { PacientesService } from './pacientes.service';
 import { CreatePacienteDto } from './dto/create-paciente.dto';
 import { RegisterPacienteDto } from './dto/register-paciente.dto';
@@ -69,5 +69,15 @@ export class PacientesController {
   @Roles(Role.ADMIN)
   async remove(@Param('id') id: number): Promise<void> {
     return this.service.remove(+id);
+  }
+
+  /**
+   * Obtener el perfil del paciente autenticado
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMe(@Req() req: any): Promise<Paciente> {
+    const accountId = req.user.id;
+    return this.service.getPacienteByAccountId(accountId);
   }
 }
