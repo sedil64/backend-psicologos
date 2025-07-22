@@ -24,8 +24,13 @@ export class CitasService {
   ) {}
 
   async create(dto: CreateCitaDto): Promise<Cita> {
+    console.log('🟡 Entrando al método create() con DTO:', dto);
+
     const psicologo = await this.psicologosService.findById(dto.psicologoId);
+    console.log('🔵 Psicólogo encontrado:', psicologo);
+
     const paciente  = await this.pacientesService.findById(dto.pacienteId);
+    console.log('🟢 Paciente encontrado:', paciente);
 
     const nueva = this.citaRepo.create({
       nombreCliente: dto.nombreCliente,
@@ -35,7 +40,10 @@ export class CitasService {
       paciente,
     });
 
-    return this.citaRepo.save(nueva);
+    const guardada = await this.citaRepo.save(nueva);
+    console.log('✅ Cita guardada:', guardada);
+
+    return guardada;
   }
 
   async findAll(): Promise<Cita[]> {
