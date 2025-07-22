@@ -65,6 +65,15 @@ export class PacientesService {
       throw new NotFoundException(`Paciente no encontrado para accountId ${id}`);
     }
 
+    // Log para depuración: mostrar el id real del paciente y el account_id
+    // eslint-disable-next-line no-console
+    console.log('[getPacienteByAccountId] Retornando paciente:', {
+      id: paciente.id,
+      account_id: paciente.account?.id,
+      nombres: paciente.nombres,
+      apellidos: paciente.apellidos
+    });
+
     return paciente;
   }
 
