@@ -23,7 +23,6 @@ import {
   EstadoDisponibilidad,
 } from '../disponibilidad/entity/disponibilidad.entity';
 import { CrearDisponibilidadDto } from '../disponibilidad/dto/crear-disponibilidad.dto';
-
 @Injectable()
 export class PsicologosService {
   private readonly logger = new Logger(PsicologosService.name);
@@ -55,7 +54,9 @@ export class PsicologosService {
 
     if (!psicologo) {
       this.logger.warn(`No se encontró psicólogo para accountId=${accountId}`);
-      throw new NotFoundException(`Psicólogo no encontrado para accountId ${accountId}`);
+      throw new NotFoundException(
+        `Psicólogo no encontrado para accountId ${accountId}`,
+      );
     }
 
     this.logger.log(
@@ -66,7 +67,12 @@ export class PsicologosService {
   }
 
   async register(dto: RegisterPsicologoDto): Promise<Psicologo> {
-    const { email, password, ...profile } = dto;
+    const {
+      email,
+      password,
+      role, // descartado explícitamente
+      ...profile
+    } = dto;
 
     this.logger.log(`Intentando registrar psicólogo con email=${email}`);
 
@@ -76,11 +82,13 @@ export class PsicologosService {
       throw new BadRequestException('El email ya está registrado');
     }
 
-    // Forzamos rol PSICOLOGO aunque venga otro
+    // Aquí la corrección: no llamar toISOString, profile.fechaNacimiento es string ISO
     const registerDto: RegisterDto = {
       email,
       password,
       role: Role.PSICOLOGO,
+      ...profile,
+      fechaNacimiento: profile.fechaNacimiento,
     };
 
     let account: Account;

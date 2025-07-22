@@ -12,7 +12,6 @@ import { Genero } from '../../common/enums/genero.enum';
 import { Role } from '../../auth/entities/account.entity';
 
 export class RegisterPsicologoDto {
-
   @IsEmail()
   email: string;
 
@@ -33,7 +32,7 @@ export class RegisterPsicologoDto {
   identificacion: string;
 
   @IsDateString()
-  fechaNacimiento: Date;
+  fechaNacimiento: string; // ✅ CORREGIDO: era Date, ahora string
 
   @IsOptional()
   @IsEnum(Genero)

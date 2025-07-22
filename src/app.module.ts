@@ -18,7 +18,6 @@ import { AdminModule } from './admin/admin.module';
 import { DisponibilidadModule } from './disponibilidad/disponibilidad.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
-// Importa RolesGuard pero NO lo registramos como global
 
 @Module({
   imports: [
@@ -34,7 +33,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
         password: configService.get<string>('DB_PASS'),
         database: configService.get<string>('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: false,
+        synchronize: true,
         ssl: { rejectUnauthorized: false },
         extra: { ssl: true },
       }),
