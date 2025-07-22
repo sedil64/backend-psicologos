@@ -23,6 +23,7 @@ import {
   EstadoDisponibilidad,
 } from '../disponibilidad/entity/disponibilidad.entity';
 import { CrearDisponibilidadDto } from '../disponibilidad/dto/crear-disponibilidad.dto';
+
 @Injectable()
 export class PsicologosService {
   private readonly logger = new Logger(PsicologosService.name);
@@ -44,19 +45,28 @@ export class PsicologosService {
     private readonly certService: CertificacionesService,
   ) {}
 
-  async getPsicologoByAccountId(accountId: number): Promise<Psicologo> {
-    this.logger.log(`Buscando psicólogo con accountId=${accountId}`);
+  private validarAccountId(accountId: any): number {
+    const id = Number(accountId);
+    if (isNaN(id)) {
+      this.logger.warn(`accountId inválido recibido: ${accountId}`);
+      throw new BadRequestException('ID de cuenta inválido');
+    }
+    return id;
+  }
 
-    const psicologo = await this.psicRepo.findOne({
-      where: { account: { id: accountId } },
-      relations: ['account'],
-    });
+  async getPsicologoByAccountId(accountId: any): Promise<Psicologo> {
+    const id = this.validarAccountId(accountId);
+    this.logger.log(`Buscando psicólogo con accountId=${id}`);
+
+    const psicologo = await this.psicRepo
+      .createQueryBuilder('psicologo')
+      .innerJoinAndSelect('psicologo.account', 'account')
+      .where('account.id = :id', { id })
+      .getOne();
 
     if (!psicologo) {
-      this.logger.warn(`No se encontró psicólogo para accountId=${accountId}`);
-      throw new NotFoundException(
-        `Psicólogo no encontrado para accountId ${accountId}`,
-      );
+      this.logger.warn(`No se encontró psicólogo para accountId=${id}`);
+      throw new NotFoundException(`Psicólogo no encontrado para accountId ${id}`);
     }
 
     this.logger.log(
@@ -82,7 +92,6 @@ export class PsicologosService {
       throw new BadRequestException('El email ya está registrado');
     }
 
-    // Aquí la corrección: no llamar toISOString, profile.fechaNacimiento es string ISO
     const registerDto: RegisterDto = {
       email,
       password,
@@ -163,9 +172,10 @@ export class PsicologosService {
     this.logger.log(`Psicólogo eliminado con id=${id}`);
   }
 
-  async findMyCitas(psicologoAccountId: number): Promise<Cita[]> {
-    this.logger.log(`Obteniendo citas para accountId=${psicologoAccountId}`);
-    const psicologo = await this.getPsicologoByAccountId(psicologoAccountId);
+  async findMyCitas(psicologoAccountId: any): Promise<Cita[]> {
+    const id = this.validarAccountId(psicologoAccountId);
+    this.logger.log(`Obteniendo citas para accountId=${id}`);
+    const psicologo = await this.getPsicologoByAccountId(id);
     const citas = await this.citaRepo.find({
       where: { psicologo: { id: psicologo.id } },
       relations: ['paciente'],
@@ -175,9 +185,10 @@ export class PsicologosService {
     return citas;
   }
 
-  async findMyPacientes(psicologoAccountId: number): Promise<Paciente[]> {
-    this.logger.log(`Obteniendo pacientes para accountId=${psicologoAccountId}`);
-    const psicologo = await this.getPsicologoByAccountId(psicologoAccountId);
+  async findMyPacientes(psicologoAccountId: any): Promise<Paciente[]> {
+    const id = this.validarAccountId(psicologoAccountId);
+    this.logger.log(`Obteniendo pacientes para accountId=${id}`);
+    const psicologo = await this.getPsicologoByAccountId(id);
     const citas = await this.citaRepo.find({
       where: { psicologo: { id: psicologo.id } },
       relations: ['paciente'],
@@ -189,11 +200,12 @@ export class PsicologosService {
   }
 
   async crearDisponibilidad(
-    accountId: number,
+    accountId: any,
     dto: CrearDisponibilidadDto,
   ): Promise<Disponibilidad> {
-    this.logger.log(`Creando disponibilidad para accountId=${accountId} con datos: ${JSON.stringify(dto)}`);
-    const psicologo = await this.getPsicologoByAccountId(accountId);
+    const id = this.validarAccountId(accountId);
+    this.logger.log(`Creando disponibilidad para accountId=${id} con datos: ${JSON.stringify(dto)}`);
+    const psicologo = await this.getPsicologoByAccountId(id);
 
     const fechaObj = new Date(dto.fecha);
     if (fechaObj < new Date()) {
@@ -229,10 +241,11 @@ export class PsicologosService {
   }
 
   async getDisponibilidadesActivas(
-    accountId: number,
+    accountId: any,
   ): Promise<Disponibilidad[]> {
-    this.logger.log(`Obteniendo disponibilidades activas para accountId=${accountId}`);
-    const psicologo = await this.getPsicologoByAccountId(accountId);
+    const id = this.validarAccountId(accountId);
+    this.logger.log(`Obteniendo disponibilidades activas para accountId=${id}`);
+    const psicologo = await this.getPsicologoByAccountId(id);
     const disponibilidades = await this.disponibilidadRepo.find({
       where: {
         psicologo: { id: psicologo.id },
