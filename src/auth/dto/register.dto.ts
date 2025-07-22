@@ -1,5 +1,4 @@
-// src/auth/dto/register.dto.ts
-import { IsEmail, IsEnum, IsNotEmpty, MinLength, IsOptional, IsDateString } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, MinLength, IsOptional, IsDateString, IsString } from 'class-validator';
 import { Role } from '../entities/account.entity';
 
 export class RegisterDto {
@@ -12,16 +11,18 @@ export class RegisterDto {
   @IsEnum(Role)
   role: Role;
 
-
   @IsOptional()
+  @IsString()
   @IsNotEmpty()
   nombres?: string;
 
   @IsOptional()
+  @IsString()
   @IsNotEmpty()
   apellidos?: string;
 
   @IsOptional()
+  @IsString()
   @IsNotEmpty()
   identificacion?: string;
 
@@ -30,6 +31,6 @@ export class RegisterDto {
   fechaNacimiento?: string;
 
   @IsOptional()
+  @IsString()
   telefono?: string;
-
 }

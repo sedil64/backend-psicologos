@@ -5,8 +5,6 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-// antes tenías:
-
 export enum Role {
   ADMIN     = 'admin',
   PSICOLOGO = 'psicologo',

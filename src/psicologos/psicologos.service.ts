@@ -76,6 +76,7 @@ export class PsicologosService {
       throw new BadRequestException('El email ya está registrado');
     }
 
+    // Forzamos rol PSICOLOGO aunque venga otro
     const registerDto: RegisterDto = {
       email,
       password,
@@ -104,7 +105,11 @@ export class PsicologosService {
       return saved;
     } catch (error) {
       this.logger.error('Error al crear perfil psicólogo, eliminando cuenta creada', error.stack);
-      await this.accountRepo.delete(account.id);
+      try {
+        await this.accountRepo.delete(account.id);
+      } catch (deleteError) {
+        this.logger.error('Error al eliminar cuenta tras fallo en psicólogo', deleteError.stack);
+      }
       throw new BadRequestException('Error al crear el perfil psicólogo: ' + error.message);
     }
   }

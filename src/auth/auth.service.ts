@@ -28,44 +28,49 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<Account> {
-    // Validar que email no esté registrado
-    const exists = await this.accountRepo.findOne({ where: { email: dto.email } });
-    if (exists) {
-      throw new BadRequestException('El email ya está registrado');
-    }
+    return await this.accountRepo.manager.transaction(async (entityManager) => {
+      // Validar que email no esté registrado
+      const exists = await entityManager.findOne(Account, { where: { email: dto.email } });
+      if (exists) {
+        throw new BadRequestException('El email ya está registrado');
+      }
 
-    const hash = await bcrypt.hash(dto.password, 10);
-    const account = this.accountRepo.create({
-      email: dto.email,
-      password: hash,
-      role: dto.role,
+      // Hashear password
+      const hash = await bcrypt.hash(dto.password, 10);
+
+      // Crear cuenta
+      const account = entityManager.create(Account, {
+        email: dto.email,
+        password: hash,
+        role: dto.role,
+      });
+      const savedAccount = await entityManager.save(account);
+
+      // Crear perfil según rol usando el mismo entityManager (transacción)
+      if (dto.role === Role.PSICOLOGO) {
+        const psicologo = entityManager.create(Psicologo, {
+          account: savedAccount,
+          nombres: dto.nombres,
+          apellidos: dto.apellidos,
+          identificacion: dto.identificacion,
+          fechaNacimiento: dto.fechaNacimiento,
+          telefono: dto.telefono,
+        });
+        await entityManager.save(psicologo);
+      } else if (dto.role === Role.PACIENTE) {
+        const paciente = entityManager.create(Paciente, {
+          account: savedAccount,
+          nombres: dto.nombres,
+          apellidos: dto.apellidos,
+          identificacion: dto.identificacion,
+          fechaNacimiento: dto.fechaNacimiento,
+          telefono: dto.telefono,
+        });
+        await entityManager.save(paciente);
+      }
+
+      return savedAccount;
     });
-    const savedAccount = await this.accountRepo.save(account);
-
-    // Crear perfil según rol
-    if (dto.role === Role.PSICOLOGO) {
-      const psicologo = this.psicologoRepo.create({
-        account: savedAccount,
-        nombres: dto.nombres,
-        apellidos: dto.apellidos,
-        identificacion: dto.identificacion,
-        fechaNacimiento: dto.fechaNacimiento,
-        telefono: dto.telefono,
-      });
-      await this.psicologoRepo.save(psicologo);
-    } else if (dto.role === Role.PACIENTE) {
-      const paciente = this.pacienteRepo.create({
-        account: savedAccount,
-        nombres: dto.nombres,
-        apellidos: dto.apellidos,
-        identificacion: dto.identificacion,
-        fechaNacimiento: dto.fechaNacimiento,
-        telefono: dto.telefono,
-      });
-      await this.pacienteRepo.save(paciente);
-    }
-
-    return savedAccount;
   }
 
   async validateUser(email: string, pass: string): Promise<Account> {
