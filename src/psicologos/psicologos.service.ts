@@ -88,11 +88,17 @@ export class PsicologosService {
     return psicologo;
   }
 
+  /**
+   * Registra un nuevo psicólogo creando primero la cuenta y luego el perfil.
+   * @param dto Datos para registro.
+   * @returns Psicólogo creado.
+   * @throws BadRequestException en caso de errores.
+   */
   async register(dto: RegisterPsicologoDto): Promise<Psicologo> {
     const {
       email,
       password,
-      role, // descartado explícitamente
+      role, // descartado para evitar override
       ...profile
     } = dto;
 
@@ -143,6 +149,12 @@ export class PsicologosService {
     }
   }
 
+  /**
+   * Crea un psicólogo asociado a una cuenta ya existente.
+   * @param dto Datos del psicólogo.
+   * @param account Cuenta asociada.
+   * @returns Psicólogo creado.
+   */
   async create(dto: CreatePsicologoDto, account: Account): Promise<Psicologo> {
     const psicologo = this.psicRepo.create({ ...dto, account });
     const saved = await this.psicRepo.save(psicologo);
@@ -150,11 +162,18 @@ export class PsicologosService {
     return saved;
   }
 
+  /**
+   * Obtiene todos los psicólogos con sus cuentas.
+   */
   async findAll(): Promise<Psicologo[]> {
     this.logger.log('Obteniendo todos los psicólogos');
     return this.psicRepo.find({ relations: ['account'] });
   }
 
+  /**
+   * Busca un psicólogo por id con su cuenta.
+   * @throws NotFoundException si no existe.
+   */
   async findById(id: number): Promise<Psicologo> {
     this.logger.log(`Buscando psicólogo con id=${id}`);
     const psicologo = await this.psicRepo.findOne({
@@ -168,6 +187,9 @@ export class PsicologosService {
     return psicologo;
   }
 
+  /**
+   * Obtiene el perfil completo incluyendo certificaciones.
+   */
   async getPerfilCompleto(id: number): Promise<any> {
     this.logger.log(`Obteniendo perfil completo para psicólogo id=${id}`);
     const psicologo = await this.findById(id);
@@ -178,12 +200,18 @@ export class PsicologosService {
     };
   }
 
+  /**
+   * Elimina un psicólogo por id.
+   */
   async delete(id: number): Promise<void> {
     this.logger.log(`Eliminando psicólogo con id=${id}`);
     await this.psicRepo.delete(id);
     this.logger.log(`Psicólogo eliminado con id=${id}`);
   }
 
+  /**
+   * Obtiene las citas del psicólogo identificado por accountId.
+   */
   async findMyCitas(psicologoAccountId: unknown): Promise<Cita[]> {
     const id = this.validarAccountId(psicologoAccountId);
     this.logger.log(`Obteniendo citas para accountId=${id}`);
@@ -197,6 +225,9 @@ export class PsicologosService {
     return citas;
   }
 
+  /**
+   * Obtiene los pacientes únicos del psicólogo mediante sus citas.
+   */
   async findMyPacientes(psicologoAccountId: unknown): Promise<Paciente[]> {
     const id = this.validarAccountId(psicologoAccountId);
     this.logger.log(`Obteniendo pacientes para accountId=${id}`);
@@ -205,12 +236,19 @@ export class PsicologosService {
       where: { psicologo: { id: psicologo.id } },
       relations: ['paciente'],
     });
+
+    // Usamos Map para evitar duplicados de pacientes
     const map = new Map<number, Paciente>();
     citas.forEach(c => map.set(c.paciente.id, c.paciente));
+
     this.logger.log(`Pacientes únicos encontrados: ${map.size}`);
     return Array.from(map.values());
   }
 
+  /**
+   * Crea una nueva disponibilidad para el psicólogo.
+   * Valida que la fecha no sea pasada y que no exista duplicado.
+   */
   async crearDisponibilidad(
     accountId: unknown,
     dto: CrearDisponibilidadDto,
@@ -220,11 +258,15 @@ export class PsicologosService {
     const psicologo = await this.getPsicologoByAccountId(id);
 
     const fechaObj = new Date(dto.fecha);
-    if (fechaObj < new Date()) {
+    const ahora = new Date();
+
+    // Compara solo fecha sin hora para evitar confusión con la hora actual
+    if (fechaObj.setHours(0,0,0,0) < ahora.setHours(0,0,0,0)) {
       this.logger.warn('Intento de crear disponibilidad en fecha pasada');
       throw new BadRequestException('No puedes liberar horarios en fechas pasadas');
     }
 
+    // Verificar si ya existe disponibilidad con misma fecha y hora inicio
     const existe = await this.disponibilidadRepo.findOne({
       where: {
         psicologo: { id: psicologo.id },
@@ -252,6 +294,9 @@ export class PsicologosService {
     return saved;
   }
 
+  /**
+   * Obtiene disponibilidades activas (libres y actuales o futuras) para el psicólogo.
+   */
   async getDisponibilidadesActivas(
     accountId: unknown,
   ): Promise<Disponibilidad[]> {
@@ -270,6 +315,9 @@ export class PsicologosService {
     return disponibilidades;
   }
 
+  /**
+   * Verifica si el psicólogo tiene alguna disponibilidad libre futura.
+   */
   async tieneDisponibilidad(psicologoId: number): Promise<boolean> {
     this.logger.log(`Consultando disponibilidad para psicólogo id=${psicologoId}`);
     const count = await this.disponibilidadRepo.count({
@@ -283,6 +331,9 @@ export class PsicologosService {
     return count > 0;
   }
 
+  /**
+   * Busca psicólogos que tengan disponibilidades libres activas.
+   */
   async findAllWithDisponibilidad(): Promise<Psicologo[]> {
     this.logger.log('Buscando psicólogos con disponibilidad libre');
     const psicologos = await this.psicRepo
@@ -298,6 +349,7 @@ export class PsicologosService {
       )
       .leftJoinAndSelect('psicologo.account', 'account')
       .getMany();
+
     this.logger.log(`Psicólogos encontrados con disponibilidad: ${psicologos.length}`);
     return psicologos;
   }

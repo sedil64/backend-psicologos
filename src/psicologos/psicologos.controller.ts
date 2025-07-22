@@ -43,38 +43,34 @@ export class PsicologosController {
   @UseGuards(JwtAuthGuard)
   @Get('me/citas')
   async getMyCitas(@Req() req: RequestWithUser): Promise<Cita[]> {
-    this.logger.log(`Obteniendo citas para accountId=${req.user.id}`);
+    const accountId = req.user.id;
+    this.logger.log(`Obteniendo citas para accountId=${accountId}`);
 
-    const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
+    const psicologo = await this.service.getPsicologoByAccountId(accountId);
     if (!psicologo) {
-      this.logger.warn(`No se encontró psicólogo para accountId=${req.user.id}`);
+      this.logger.warn(`No se encontró psicólogo para accountId=${accountId}`);
       throw new NotFoundException('Psicólogo no encontrado');
     }
-    this.logger.log(`Psicólogo encontrado: id=${psicologo.id}`);
 
-    // PASAR EL accountId, no psicologo.id
-    const citas = await this.service.findMyCitas(req.user.id);
+    const citas = await this.service.findMyCitas(accountId);
     this.logger.log(`Número de citas encontradas: ${citas.length}`);
-
     return citas;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me/pacientes')
   async getMyPacientes(@Req() req: RequestWithUser): Promise<Paciente[]> {
-    this.logger.log(`Obteniendo pacientes para accountId=${req.user.id}`);
+    const accountId = req.user.id;
+    this.logger.log(`Obteniendo pacientes para accountId=${accountId}`);
 
-    const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
+    const psicologo = await this.service.getPsicologoByAccountId(accountId);
     if (!psicologo) {
-      this.logger.warn(`No se encontró psicólogo para accountId=${req.user.id}`);
+      this.logger.warn(`No se encontró psicólogo para accountId=${accountId}`);
       throw new NotFoundException('Psicólogo no encontrado');
     }
-    this.logger.log(`Psicólogo encontrado: id=${psicologo.id}`);
 
-    // PASAR EL accountId, no psicologo.id
-    const pacientes = await this.service.findMyPacientes(req.user.id);
+    const pacientes = await this.service.findMyPacientes(accountId);
     this.logger.log(`Número de pacientes encontrados: ${pacientes.length}`);
-
     return pacientes;
   }
 
@@ -84,19 +80,21 @@ export class PsicologosController {
     @Body() dto: CrearDisponibilidadDto,
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad> {
-    this.logger.log(`Creando disponibilidad para accountId=${req.user.id} con datos: ${JSON.stringify(dto)}`);
-    const result = await this.service.crearDisponibilidad(req.user.id, dto);
-    this.logger.log(`Disponibilidad creada con id: ${result.id}`);
-    return result;
+    const accountId = req.user.id;
+    this.logger.log(`Creando disponibilidad para accountId=${accountId} con datos: ${JSON.stringify(dto)}`);
+
+    const disponibilidad = await this.service.crearDisponibilidad(accountId, dto);
+    this.logger.log(`Disponibilidad creada con id: ${disponibilidad.id}`);
+    return disponibilidad;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me/disponibilidad')
-  async getDisponibilidadesActivas(
-    @Req() req: RequestWithUser,
-  ): Promise<Disponibilidad[]> {
-    this.logger.log(`Obteniendo disponibilidades activas para accountId=${req.user.id}`);
-    const disponibilidades = await this.service.getDisponibilidadesActivas(req.user.id);
+  async getDisponibilidadesActivas(@Req() req: RequestWithUser): Promise<Disponibilidad[]> {
+    const accountId = req.user.id;
+    this.logger.log(`Obteniendo disponibilidades activas para accountId=${accountId}`);
+
+    const disponibilidades = await this.service.getDisponibilidadesActivas(accountId);
     this.logger.log(`Número de disponibilidades activas: ${disponibilidades.length}`);
     return disponibilidades;
   }
@@ -104,10 +102,7 @@ export class PsicologosController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Post()
-  async create(
-    @Body() dto: CreatePsicologoDto,
-    @Req() req: RequestWithUser,
-  ): Promise<Psicologo> {
+  async create(@Body() dto: CreatePsicologoDto, @Req() req: RequestWithUser): Promise<Psicologo> {
     this.logger.log(`ADMIN creando psicólogo con datos: ${JSON.stringify(dto)} por usuario: ${req.user.id}`);
     const result = await this.service.create(dto, req.user);
     this.logger.log(`Psicólogo creado con id: ${result.id}`);
@@ -156,9 +151,7 @@ export class PsicologosController {
 
   @Public()
   @Get(':id/tiene-disponibilidad')
-  async tieneDisponibilidad(
-    @Param('id') id: number,
-  ): Promise<{ disponible: boolean }> {
+  async tieneDisponibilidad(@Param('id') id: number): Promise<{ disponible: boolean }> {
     this.logger.log(`Consultando disponibilidad para psicólogo id=${id}`);
     const disponible = await this.service.tieneDisponibilidad(id);
     this.logger.log(`Disponibilidad para psicólogo id=${id}: ${disponible}`);
