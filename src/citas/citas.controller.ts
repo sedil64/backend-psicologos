@@ -22,7 +22,6 @@ import { Role } from '../auth/entities/account.entity';
 interface RequestWithUser extends Request {
   user: { id: number; role: Role };
 }
-
 @Controller('citas')
 export class CitasController {
   constructor(private readonly citasService: CitasService) {}
@@ -30,7 +29,8 @@ export class CitasController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.PACIENTE)
   @Post()
-  create(@Body() dto: CreateCitaDto): Promise<Cita> {
+  async create(@Body() dto: CreateCitaDto): Promise<Cita> {
+    console.log('POST /citas - DTO recibido:', dto);
     return this.citasService.create(dto);
   }
 

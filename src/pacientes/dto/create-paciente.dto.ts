@@ -3,8 +3,6 @@ import {
   IsDateString,
   IsEnum,
   IsOptional,
-  IsNumber,
-  IsNotEmpty,
 } from 'class-validator';
 import { Genero } from '../../common/enums/genero.enum';
 
