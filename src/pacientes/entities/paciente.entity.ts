@@ -43,9 +43,6 @@ export class Paciente {
   @Column({ length: 20, nullable: true })
   telefonoEmergencia?: string;
 
-  @Column({ length: 100 })
-  correoElectronico: string;
-
   @Column({ nullable: true })
   direccion?: string;
 
@@ -58,7 +55,6 @@ export class Paciente {
   @Column({ default: true })
   activo: boolean;
 
-  // Relación 1:N con Cita
   @OneToMany(() => Cita, cita => cita.paciente)
   citas: Cita[];
 

@@ -7,7 +7,6 @@ import {
 } from 'class-validator';
 import { Genero } from '../../common/enums/genero.enum';
 import { Role } from '../../auth/entities/account.entity';
-/*comentarios*/
 export class CreatePsicologoDto {
   @IsString()
   nombres: string;
