@@ -1,4 +1,3 @@
-// src/psicologos/psicologos.controller.ts
 import {
   Controller,
   Post,
@@ -8,6 +7,7 @@ import {
   Body,
   UseGuards,
   Req,
+  Logger,
 } from '@nestjs/common';
 import { PsicologosService } from './psicologos.service';
 import { CreatePsicologoDto } from './dto/create-psicologo.dto';
@@ -26,26 +26,39 @@ import { Paciente } from '../pacientes/entities/paciente.entity';
 
 @Controller('psicologos')
 export class PsicologosController {
+  private readonly logger = new Logger(PsicologosController.name);
+
   constructor(private readonly service: PsicologosService) {}
 
   @Public()
   @Post('register')
   async register(@Body() dto: RegisterPsicologoDto): Promise<Psicologo> {
-    return this.service.register(dto);
+    this.logger.log(`Registro de nuevo psicólogo con datos: ${JSON.stringify(dto)}`);
+    const result = await this.service.register(dto);
+    this.logger.log(`Psicólogo registrado con id: ${result.id}`);
+    return result;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me/citas')
   async getMyCitas(@Req() req: RequestWithUser): Promise<Cita[]> {
+    this.logger.log(`Obteniendo citas para accountId=${req.user.id}`);
     const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
-    return this.service.findMyCitas(psicologo.id);
+    this.logger.log(`Psicólogo encontrado: id=${psicologo.id}`);
+    const citas = await this.service.findMyCitas(psicologo.id);
+    this.logger.log(`Número de citas encontradas: ${citas.length}`);
+    return citas;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me/pacientes')
   async getMyPacientes(@Req() req: RequestWithUser): Promise<Paciente[]> {
+    this.logger.log(`Obteniendo pacientes para accountId=${req.user.id}`);
     const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
-    return this.service.findMyPacientes(psicologo.id);
+    this.logger.log(`Psicólogo encontrado: id=${psicologo.id}`);
+    const pacientes = await this.service.findMyPacientes(psicologo.id);
+    this.logger.log(`Número de pacientes encontrados: ${pacientes.length}`);
+    return pacientes;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -54,7 +67,10 @@ export class PsicologosController {
     @Body() dto: CrearDisponibilidadDto,
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad> {
-    return this.service.crearDisponibilidad(req.user.id, dto);
+    this.logger.log(`Creando disponibilidad para accountId=${req.user.id} con datos: ${JSON.stringify(dto)}`);
+    const result = await this.service.crearDisponibilidad(req.user.id, dto);
+    this.logger.log(`Disponibilidad creada con id: ${result.id}`);
+    return result;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -62,7 +78,10 @@ export class PsicologosController {
   async getDisponibilidadesActivas(
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad[]> {
-    return this.service.getDisponibilidadesActivas(req.user.id);
+    this.logger.log(`Obteniendo disponibilidades activas para accountId=${req.user.id}`);
+    const disponibilidades = await this.service.getDisponibilidadesActivas(req.user.id);
+    this.logger.log(`Número de disponibilidades activas: ${disponibilidades.length}`);
+    return disponibilidades;
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -72,32 +91,46 @@ export class PsicologosController {
     @Body() dto: CreatePsicologoDto,
     @Req() req: RequestWithUser,
   ): Promise<Psicologo> {
-    return this.service.create(dto, req.user);
+    this.logger.log(`ADMIN creando psicólogo con datos: ${JSON.stringify(dto)} por usuario: ${req.user.id}`);
+    const result = await this.service.create(dto, req.user);
+    this.logger.log(`Psicólogo creado con id: ${result.id}`);
+    return result;
   }
 
   @Public()
   @Get()
   async findAll(): Promise<Psicologo[]> {
-    return this.service.findAll();
+    this.logger.log(`Obteniendo todos los psicólogos`);
+    const psicologos = await this.service.findAll();
+    this.logger.log(`Número total de psicólogos: ${psicologos.length}`);
+    return psicologos;
   }
 
   @Public()
   @Get('perfil/:id')
   async getPerfil(@Param('id') id: number): Promise<any> {
-    return this.service.getPerfilCompleto(+id);
+    this.logger.log(`Obteniendo perfil completo para psicólogo id=${id}`);
+    const perfil = await this.service.getPerfilCompleto(id);
+    this.logger.log(`Perfil obtenido para psicólogo id=${id}`);
+    return perfil;
   }
 
   @Public()
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Psicologo> {
-    return this.service.findById(+id);
+    this.logger.log(`Buscando psicólogo con id=${id}`);
+    const psicologo = await this.service.findById(id);
+    this.logger.log(`Psicólogo encontrado: id=${psicologo.id}`);
+    return psicologo;
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
-    return this.service.delete(+id);
+    this.logger.log(`ADMIN eliminando psicólogo con id=${id}`);
+    await this.service.delete(id);
+    this.logger.log(`Psicólogo eliminado con id=${id}`);
   }
 
   @Public()
@@ -105,7 +138,9 @@ export class PsicologosController {
   async tieneDisponibilidad(
     @Param('id') id: number,
   ): Promise<{ disponible: boolean }> {
-    const disponible = await this.service.tieneDisponibilidad(+id);
+    this.logger.log(`Consultando disponibilidad para psicólogo id=${id}`);
+    const disponible = await this.service.tieneDisponibilidad(id);
+    this.logger.log(`Disponibilidad para psicólogo id=${id}: ${disponible}`);
     return { disponible };
   }
 }
