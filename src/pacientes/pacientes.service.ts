@@ -37,9 +37,15 @@ export class PacientesService {
 
   // Obtener paciente por el ID de cuenta asociada
   async getPacienteByAccountId(accountId: number): Promise<Paciente> {
+    // Validar que el accountId sea un número válido
+    const id = Number(accountId);
+    if (isNaN(id) || id <= 0) {
+      throw new BadRequestException('ID de cuenta inválido');
+    }
+
     // Intento estándar (TypeORM relación)
     let paciente = await this.pacienteRepository.findOne({
-      where: { account: { id: accountId } },
+      where: { account: { id } },
       relations: ['account'],
     });
 
@@ -48,12 +54,12 @@ export class PacientesService {
       paciente = await this.pacienteRepository
         .createQueryBuilder('paciente')
         .leftJoinAndSelect('paciente.account', 'account')
-        .where('paciente.account_id = :accountId', { accountId })
+        .where('paciente.account_id = :accountId', { accountId: id })
         .getOne();
     }
 
     if (!paciente) {
-      throw new NotFoundException(`Paciente no encontrado para accountId ${accountId}`);
+      throw new NotFoundException(`Paciente no encontrado para accountId ${id}`);
     }
 
     return paciente;
