@@ -1,3 +1,4 @@
+// src/auth/auth.service.ts
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -5,15 +6,24 @@ import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Account } from './entities/account.entity';
+import { Account, Role } from './entities/account.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { Psicologo } from '../psicologos/entities/psicologos.entity';
+import { Paciente } from '../pacientes/entities/paciente.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(Account)
     private readonly accountRepo: Repository<Account>,
+
+    @InjectRepository(Psicologo)
+    private readonly psicologoRepo: Repository<Psicologo>,
+
+    @InjectRepository(Paciente)
+    private readonly pacienteRepo: Repository<Paciente>,
+
     private readonly jwtService: JwtService,
   ) {}
 
@@ -30,7 +40,32 @@ export class AuthService {
       password: hash,
       role: dto.role,
     });
-    return this.accountRepo.save(account);
+    const savedAccount = await this.accountRepo.save(account);
+
+    // Crear perfil según rol
+    if (dto.role === Role.PSICOLOGO) {
+      const psicologo = this.psicologoRepo.create({
+        account: savedAccount,
+        nombres: dto.nombres,
+        apellidos: dto.apellidos,
+        identificacion: dto.identificacion,
+        fechaNacimiento: dto.fechaNacimiento,
+        telefono: dto.telefono,
+      });
+      await this.psicologoRepo.save(psicologo);
+    } else if (dto.role === Role.PACIENTE) {
+      const paciente = this.pacienteRepo.create({
+        account: savedAccount,
+        nombres: dto.nombres,
+        apellidos: dto.apellidos,
+        identificacion: dto.identificacion,
+        fechaNacimiento: dto.fechaNacimiento,
+        telefono: dto.telefono,
+      });
+      await this.pacienteRepo.save(paciente);
+    }
+
+    return savedAccount;
   }
 
   async validateUser(email: string, pass: string): Promise<Account> {
