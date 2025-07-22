@@ -1,5 +1,15 @@
-import { IsEmail, IsEnum, IsNotEmpty, MinLength, IsOptional, IsDateString, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  MinLength,
+  IsOptional,
+  IsDateString,
+  IsString,
+  IsNumber,
+} from 'class-validator';
 import { Role } from '../entities/account.entity';
+import { Genero } from '../../common/enums/genero.enum';
 
 export class RegisterDto {
   @IsEmail()
@@ -33,4 +43,33 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   telefono?: string;
+
+  @IsOptional()
+  @IsString()
+  telefonoEmergencia?: string;
+
+  @IsOptional()
+  @IsString()
+  direccion?: string;
+
+  @IsOptional()
+  @IsEnum(Genero)
+  genero?: Genero;
+
+  // Campos específicos del psicólogo
+  @IsOptional()
+  @IsString()
+  especialidad?: string;
+
+  @IsOptional()
+  @IsString()
+  universidad?: string;
+
+  @IsOptional()
+  @IsNumber()
+  experiencia?: number;
+
+  @IsOptional()
+  @IsString()
+  certificaciones?: string;
 }
