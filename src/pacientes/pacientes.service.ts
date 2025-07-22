@@ -37,10 +37,13 @@ export class PacientesService {
 
   // Obtener paciente por el ID de cuenta asociada
   async getPacienteByAccountId(accountId: number): Promise<Paciente> {
-    // Validar que el accountId sea un número válido
+    // Validar que el accountId sea un número válido y loguear el valor recibido
+    if (accountId === null || accountId === undefined) {
+      throw new BadRequestException('ID de cuenta no proporcionado');
+    }
     const id = Number(accountId);
     if (isNaN(id) || id <= 0) {
-      throw new BadRequestException('ID de cuenta inválido');
+      throw new BadRequestException(`ID de cuenta inválido: recibido='${accountId}'`);
     }
 
     // Intento estándar (TypeORM relación)
