@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: nest-api
+    env: node
+    plan: free
+    repo: https://github.com/sedil64/resultados-deportivos-backend
+    branch: main
+    buildCommand: npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: PORT
+        value: 3006
