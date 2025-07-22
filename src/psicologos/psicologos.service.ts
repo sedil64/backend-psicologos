@@ -261,7 +261,7 @@ export class PsicologosService {
     const ahora = new Date();
 
     // Compara solo fecha sin hora para evitar confusión con la hora actual
-    if (fechaObj.setHours(0,0,0,0) < ahora.setHours(0,0,0,0)) {
+    if (fechaObj.setHours(0, 0, 0, 0) < ahora.setHours(0, 0, 0, 0)) {
       this.logger.warn('Intento de crear disponibilidad en fecha pasada');
       throw new BadRequestException('No puedes liberar horarios en fechas pasadas');
     }
