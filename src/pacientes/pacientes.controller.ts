@@ -29,9 +29,7 @@ export class PacientesController {
    */
   @Public()
   @Post('register')
-  async register(
-    @Body() dto: RegisterPacienteDto
-  ): Promise<Paciente> {
+  register(@Body() dto: RegisterPacienteDto) {
     return this.service.register(dto);
   }
 
@@ -41,9 +39,7 @@ export class PacientesController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async create(
-    @Body() dto: CreatePacienteDto
-  ): Promise<Paciente> {
+  async create(@Body() dto: CreatePacienteDto): Promise<Paciente> {
     return this.service.create(dto);
   }
 
@@ -61,9 +57,7 @@ export class PacientesController {
    */
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async findOne(
-    @Param('id') id: number
-  ): Promise<Paciente> {
+  async findOne(@Param('id') id: number): Promise<Paciente> {
     return this.service.findById(+id);
   }
 
@@ -73,9 +67,7 @@ export class PacientesController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async remove(
-    @Param('id') id: number
-  ): Promise<void> {
+  async remove(@Param('id') id: number): Promise<void> {
     return this.service.remove(+id);
   }
 }

@@ -1,26 +1,46 @@
+// create-paciente.dto.ts
 import {
   IsString,
   IsDateString,
   IsEnum,
   IsOptional,
   IsNumber,
-  IsEmail,
-  MinLength,
-  IsBoolean,
+  IsNotEmpty,
 } from 'class-validator';
 import { Genero } from '../../common/enums/genero.enum';
-import { Role } from '../../auth/entities/account.entity';
-import { CreatePacienteDto } from './create-paciente.dto';
 
-export class RegisterPacienteDto extends CreatePacienteDto {
-  @IsEmail()
-  email: string;
+export class CreatePacienteDto {
+  @IsString()
+  nombres: string;
 
   @IsString()
-  @MinLength(6)
-  password: string;
+  apellidos: string;
 
-  @IsEnum(Role)
-  role: Role = Role.PACIENTE;
+  @IsString()
+  identificacion: string;
 
+  @IsDateString()
+  fechaNacimiento: Date;
+
+  @IsEnum(Genero)
+  @IsOptional()
+  genero?: Genero;
+
+  @IsString()
+  telefono: string;
+
+  @IsOptional()
+  @IsString()
+  telefonoEmergencia?: string;
+
+  @IsOptional()
+  @IsString()
+  direccion?: string;
+
+  @IsNumber()
+  edad: number;
+
+  @IsOptional()
+  @IsString()
+  antecedentesClinicos?: string;
 }

@@ -1,13 +1,13 @@
+// create-paciente.dto.ts
 import {
   IsString,
   IsDateString,
   IsEnum,
   IsOptional,
   IsNumber,
-  IsBoolean, 
+  IsNotEmpty,
 } from 'class-validator';
 import { Genero } from '../../common/enums/genero.enum';
-import { Role } from '../../auth/entities/account.entity';
 
 export class CreatePacienteDto {
   @IsString()
@@ -22,8 +22,8 @@ export class CreatePacienteDto {
   @IsDateString()
   fechaNacimiento: Date;
 
-  @IsOptional()
   @IsEnum(Genero)
+  @IsOptional()
   genero?: Genero;
 
   @IsString()
@@ -43,14 +43,4 @@ export class CreatePacienteDto {
   @IsOptional()
   @IsString()
   antecedentesClinicos?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  activo?: boolean;
-}
-
-// DTO para registro donde sí incluyes el rol de la cuenta, pero no correo ni password acá (eso va en DTO de cuenta)
-export class RegisterPacienteDto extends CreatePacienteDto {
-  @IsEnum(Role)
-  role: Role = Role.PACIENTE;
 }
