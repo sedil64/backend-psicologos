@@ -4,8 +4,6 @@ import {
   IsEnum,
   IsOptional,
   IsNumber,
-  IsEmail,
-  MinLength,
 } from 'class-validator';
 import { Genero } from '../../common/enums/genero.enum';
 import { Role } from '../../auth/entities/account.entity';

@@ -8,6 +8,7 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @IsEnum(['admin','psicologo','paciente'])
+  @IsEnum(Role)
   role: Role;
+
 }

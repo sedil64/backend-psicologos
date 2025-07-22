@@ -1,19 +1,11 @@
 // src/disponibilidad/entity/disponibilidad.entity.ts
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Psicologo } from '../../psicologos/entities/psicologos.entity';
 
 export enum EstadoDisponibilidad {
   Libre = 'libre',
-  Reservada = 'reservada',
-  Expirada = 'expirada',
+  Reservado = 'reservado',
+  Cancelado = 'cancelado',
 }
 
 @Entity('disponibilidades')
@@ -21,14 +13,17 @@ export class Disponibilidad {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ManyToOne(() => Psicologo, psicologo => psicologo.disponibilidades, { onDelete: 'CASCADE' })
+  psicologo: Psicologo;
+
   @Column({ type: 'date' })
   fecha: Date;
 
-  @Column({ type: 'time' })
-  horaInicio: string;
+  @Column()
+  horaInicio: string; // Por ejemplo: '08:00'
 
-  @Column({ type: 'time' })
-  horaFin: string;
+  @Column()
+  horaFin: string;   // Por ejemplo: '09:00'
 
   @Column({
     type: 'enum',
@@ -36,18 +31,4 @@ export class Disponibilidad {
     default: EstadoDisponibilidad.Libre,
   })
   estado: EstadoDisponibilidad;
-
-  @ManyToOne(
-    () => Psicologo,
-    psicologo => psicologo.disponibilidades,
-    { eager: true, onDelete: 'CASCADE' },
-  )
-  @JoinColumn({ name: 'psicologo_id' })
-  psicologo: Psicologo;
-
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
 }

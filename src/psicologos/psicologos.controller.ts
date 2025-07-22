@@ -54,8 +54,8 @@ export class PsicologosController {
     @Body() dto: CrearDisponibilidadDto,
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad> {
-    const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
-    return this.service.crearDisponibilidad(psicologo.id, dto);
+    // PASAMOS EL ACCOUNT ID, EL SERVICE SE ENCARGA DE BUSCAR PSICÓLOGO
+    return this.service.crearDisponibilidad(req.user.id, dto);
   }
 
   @Get('me/disponibilidad')
@@ -63,8 +63,8 @@ export class PsicologosController {
   async getDisponibilidadesActivas(
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad[]> {
-    const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
-    return this.service.getDisponibilidadesActivas(psicologo.id);
+    // PASAMOS EL ACCOUNT ID
+    return this.service.getDisponibilidadesActivas(req.user.id);
   }
 
   @Post()

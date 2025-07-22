@@ -9,7 +9,7 @@ import { Psicologo } from './entities/psicologos.entity';
 import { Account } from '../auth/entities/account.entity';
 import { Cita } from '../citas/entities/citas.entity';
 import { Paciente } from '../pacientes/entities/paciente.entity';
-import { Disponibilidad } from '../disponibilidad/entity/disponibilidad.entity'; // ✅ FALTA ESTO
+import { Disponibilidad } from '../disponibilidad/entity/disponibilidad.entity';
 
 import { AuthModule } from '../auth/auth.module';
 import { CertificacionesModule } from '../certificaciones/certificaciones.module';
@@ -17,13 +17,7 @@ import { CitasModule } from '../citas/citas.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Psicologo,
-      Account,
-      Cita,
-      Paciente,
-      Disponibilidad, // ✅ AGREGA ESTO
-    ]),
+    TypeOrmModule.forFeature([Psicologo, Account, Cita, Paciente, Disponibilidad]),
     AuthModule,
     CertificacionesModule,
     forwardRef(() => CitasModule),

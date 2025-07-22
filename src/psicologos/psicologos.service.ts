@@ -15,6 +15,7 @@ import { RegisterPsicologoDto } from './dto/register-psicologo.dto';
 
 import { Account, Role } from '../auth/entities/account.entity';
 import { AuthService } from '../auth/auth.service';
+import { RegisterDto } from '../auth/dto/register.dto';
 import { CertificacionesService } from '../certificaciones/certificaciones.service';
 import { Cita } from '../citas/entities/citas.entity';
 import { Paciente } from '../pacientes/entities/paciente.entity';
@@ -47,7 +48,7 @@ export class PsicologosService {
   async getPsicologoByAccountId(accountId: number): Promise<Psicologo> {
     const psicologo = await this.psicRepo.findOne({
       where: { account: { id: accountId } },
-      relations: ['account'], // 🔍 asegura relación cargada
+      relations: ['account'], // asegura relación cargada
     });
 
     if (!psicologo) {
@@ -57,22 +58,44 @@ export class PsicologosService {
     return psicologo;
   }
 
-  // ✅ Registro completo con vinculación entre Account y Psicologo
+  // Registro completo con vinculación entre Account y Psicologo, con validación email único y manejo errores
   async register(dto: RegisterPsicologoDto): Promise<Psicologo> {
     const { email, password, ...profile } = dto;
 
-    const account = await this.authService.register({
+    // Verificar si el email ya existe
+    const existingAccount = await this.accountRepo.findOne({ where: { email } });
+    if (existingAccount) {
+      throw new BadRequestException('El email ya está registrado');
+    }
+
+    // Crear DTO para registro de cuenta
+    const registerDto: RegisterDto = {
       email,
       password,
       role: Role.PSICOLOGO,
-    });
+    };
 
+    // Crear cuenta
+    let account: Account;
+    try {
+      account = await this.authService.register(registerDto);
+    } catch (error) {
+      throw new BadRequestException('Error al crear la cuenta: ' + error.message);
+    }
+
+    // Crear perfil psicólogo vinculado
     const psicologo = this.psicRepo.create({
       ...profile,
       account,
     });
 
-    return this.psicRepo.save(psicologo);
+    try {
+      return await this.psicRepo.save(psicologo);
+    } catch (error) {
+      // En caso de error al guardar psicólogo, elimina la cuenta para mantener consistencia
+      await this.accountRepo.delete(account.id);
+      throw new BadRequestException('Error al crear el perfil psicólogo: ' + error.message);
+    }
   }
 
   async create(dto: CreatePsicologoDto, account: Account): Promise<Psicologo> {
@@ -188,10 +211,15 @@ export class PsicologosService {
   async findAllWithDisponibilidad(): Promise<Psicologo[]> {
     return this.psicRepo
       .createQueryBuilder('psicologo')
-      .innerJoin('psicologo.disponibilidades', 'disponibilidad', 'disponibilidad.estado = :estado AND disponibilidad.fecha >= :hoy', {
-        estado: EstadoDisponibilidad.Libre,
-        hoy: new Date(),
-      })
+      .innerJoin(
+        'psicologo.disponibilidades',
+        'disponibilidad',
+        'disponibilidad.estado = :estado AND disponibilidad.fecha >= :hoy',
+        {
+          estado: EstadoDisponibilidad.Libre,
+          hoy: new Date(),
+        },
+      )
       .leftJoinAndSelect('psicologo.account', 'account')
       .getMany();
   }

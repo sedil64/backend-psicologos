@@ -1,9 +1,10 @@
+// src/psicologos/entities/psicologos.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
-  OneToMany,    // ← importa OneToMany
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { Account } from '../../auth/entities/account.entity';
@@ -46,9 +47,6 @@ export class Psicologo {
   @Column({ nullable: true })
   telefonoEmergencia: string;
 
-  @Column()
-  email: string;
-
   @Column({ nullable: true })
   direccion: string;
 
@@ -73,10 +71,6 @@ export class Psicologo {
   @OneToMany(() => Cita, cita => cita.psicologo, { cascade: true })
   citas: Cita[];
 
-  @OneToMany(
-    () => Disponibilidad,
-    disponibilidad => disponibilidad.psicologo,
-  )
+  @OneToMany(() => Disponibilidad, disponibilidad => disponibilidad.psicologo)
   disponibilidades: Disponibilidad[];
-
 }

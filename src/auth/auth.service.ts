@@ -1,5 +1,4 @@
-// src/auth/auth.service.ts
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
@@ -19,11 +18,17 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<Account> {
+    // Validar que email no esté registrado
+    const exists = await this.accountRepo.findOne({ where: { email: dto.email } });
+    if (exists) {
+      throw new BadRequestException('El email ya está registrado');
+    }
+
     const hash = await bcrypt.hash(dto.password, 10);
     const account = this.accountRepo.create({
       email: dto.email,
       password: hash,
-      role: dto.role,      
+      role: dto.role,
     });
     return this.accountRepo.save(account);
   }
@@ -31,8 +36,10 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<Account> {
     const account = await this.accountRepo.findOne({ where: { email } });
     if (!account) throw new UnauthorizedException('Credenciales inválidas');
+
     const isValid = await bcrypt.compare(pass, account.password);
     if (!isValid) throw new UnauthorizedException('Credenciales inválidas');
+
     return account;
   }
 
