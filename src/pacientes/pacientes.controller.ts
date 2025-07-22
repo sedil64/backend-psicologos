@@ -11,14 +11,13 @@ import {
 import { PacientesService } from './pacientes.service';
 import { CreatePacienteDto } from './dto/create-paciente.dto';
 import { RegisterPacienteDto } from './dto/register-paciente.dto';
-
 import { Public } from '../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../auth/entities/account.entity';
-
 import { Paciente } from './entities/paciente.entity';
+
 
 @Controller('pacientes')
 export class PacientesController {
@@ -53,6 +52,16 @@ export class PacientesController {
   }
 
   /**
+   * Obtener el perfil del paciente autenticado
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMe(@Req() req: any): Promise<Paciente> {
+    const accountId = req.user.id;
+    return this.service.getPacienteByAccountId(accountId);
+  }
+
+  /**
    * Obtener un paciente por su ID
    */
   @Get(':id')
@@ -70,14 +79,5 @@ export class PacientesController {
   async remove(@Param('id') id: number): Promise<void> {
     return this.service.remove(+id);
   }
-
-  /**
-   * Obtener el perfil del paciente autenticado
-   */
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async getMe(@Req() req: any): Promise<Paciente> {
-    const accountId = req.user.id;
-    return this.service.getPacienteByAccountId(accountId);
-  }
 }
+
