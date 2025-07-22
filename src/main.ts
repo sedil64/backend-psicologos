@@ -27,6 +27,7 @@ async function bootstrap() {
       'http://localhost:5173',
       'https://desarrollo-software.xyz',
       'https://front-end-psicologos.vercel.app',
+      'https://resultados-deportivos-backend.onrender.com',
     ],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
