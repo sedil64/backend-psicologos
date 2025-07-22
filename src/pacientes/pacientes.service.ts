@@ -37,10 +37,20 @@ export class PacientesService {
 
   // Obtener paciente por el ID de cuenta asociada
   async getPacienteByAccountId(accountId: number): Promise<Paciente> {
-    const paciente = await this.pacienteRepository.findOne({
+    // Intento estándar (TypeORM relación)
+    let paciente = await this.pacienteRepository.findOne({
       where: { account: { id: accountId } },
       relations: ['account'],
     });
+
+    // Si no lo encuentra, buscar por account_id directo (más robusto)
+    if (!paciente) {
+      paciente = await this.pacienteRepository
+        .createQueryBuilder('paciente')
+        .leftJoinAndSelect('paciente.account', 'account')
+        .where('paciente.account_id = :accountId', { accountId })
+        .getOne();
+    }
 
     if (!paciente) {
       throw new NotFoundException(`Paciente no encontrado para accountId ${accountId}`);
