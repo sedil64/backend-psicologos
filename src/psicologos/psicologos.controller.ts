@@ -31,45 +31,43 @@ export class PsicologosController {
   @Public()
   @Post('register')
   async register(@Body() dto: RegisterPsicologoDto): Promise<Psicologo> {
-    return this.service.register(dto); // ✅ vincula cuenta al psicólogo
+    return this.service.register(dto);
   }
 
-  @Get('me/citas')
   @UseGuards(JwtAuthGuard)
+  @Get('me/citas')
   async getMyCitas(@Req() req: RequestWithUser): Promise<Cita[]> {
     const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
     return this.service.findMyCitas(psicologo.id);
   }
 
-  @Get('me/pacientes')
   @UseGuards(JwtAuthGuard)
+  @Get('me/pacientes')
   async getMyPacientes(@Req() req: RequestWithUser): Promise<Paciente[]> {
     const psicologo = await this.service.getPsicologoByAccountId(req.user.id);
     return this.service.findMyPacientes(psicologo.id);
   }
 
-  @Post('me/disponibilidad')
   @UseGuards(JwtAuthGuard)
+  @Post('me/disponibilidad')
   async crearDisponibilidad(
     @Body() dto: CrearDisponibilidadDto,
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad> {
-    // PASAMOS EL ACCOUNT ID, EL SERVICE SE ENCARGA DE BUSCAR PSICÓLOGO
     return this.service.crearDisponibilidad(req.user.id, dto);
   }
 
-  @Get('me/disponibilidad')
   @UseGuards(JwtAuthGuard)
+  @Get('me/disponibilidad')
   async getDisponibilidadesActivas(
     @Req() req: RequestWithUser,
   ): Promise<Disponibilidad[]> {
-    // PASAMOS EL ACCOUNT ID
     return this.service.getDisponibilidadesActivas(req.user.id);
   }
 
-  @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @Post()
   async create(
     @Body() dto: CreatePsicologoDto,
     @Req() req: RequestWithUser,
@@ -83,27 +81,27 @@ export class PsicologosController {
     return this.service.findAll();
   }
 
+  @Public()
   @Get('perfil/:id')
-  @UseGuards(JwtAuthGuard)
   async getPerfil(@Param('id') id: number): Promise<any> {
     return this.service.getPerfilCompleto(+id);
   }
 
+  @Public()
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: number): Promise<Psicologo> {
     return this.service.findById(+id);
   }
 
-  @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     return this.service.delete(+id);
   }
 
+  @Public()
   @Get(':id/tiene-disponibilidad')
-  @UseGuards(JwtAuthGuard)
   async tieneDisponibilidad(
     @Param('id') id: number,
   ): Promise<{ disponible: boolean }> {
