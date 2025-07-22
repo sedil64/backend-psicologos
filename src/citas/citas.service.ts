@@ -129,12 +129,27 @@ export class CitasService {
       });
       console.log('🔷 Nueva cita creada en memoria (antes de guardar):', cita);
 
-      const citaGuardada = await this.citaRepo.save(cita);
-      console.log('✅ Cita guardada en base de datos:', citaGuardada);
+      // Log antes de guardar la cita
+      console.log('🟠 Guardando cita en base de datos...');
+      let citaGuardada;
+      try {
+        citaGuardada = await this.citaRepo.save(cita);
+        console.log('✅ Cita guardada en base de datos:', citaGuardada);
+      } catch (err) {
+        console.error('❌ Error al guardar la cita en base de datos:', err);
+        throw err;
+      }
 
-      disponibilidad.estado = EstadoDisponibilidad.Reservada;
-      await this.disponibilidadRepo.save(disponibilidad);
-      console.log(`✅ Disponibilidad con id=${disponibilidadId} marcada como Reservada`);
+      // Log antes de guardar la disponibilidad
+      console.log('🟠 Guardando disponibilidad como reservada...');
+      try {
+        disponibilidad.estado = EstadoDisponibilidad.Reservada;
+        await this.disponibilidadRepo.save(disponibilidad);
+        console.log(`✅ Disponibilidad con id=${disponibilidadId} marcada como Reservada`);
+      } catch (err) {
+        console.error('❌ Error al guardar la disponibilidad como reservada:', err);
+        throw err;
+      }
 
       return citaGuardada;
     } catch (err) {
