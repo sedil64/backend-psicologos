@@ -1,4 +1,3 @@
-// src/psicologos/entities/psicologos.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
